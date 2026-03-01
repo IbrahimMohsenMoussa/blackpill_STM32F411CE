@@ -1,0 +1,192 @@
+build:
+  generated-by: csolution version 2.13.0+p3-g40b6564e
+  solution: ../../../project.csolution.yml
+  project: ../../../project.cproject.yml
+  context: project+Target_1
+  compiler: AC6
+  device: STMicroelectronics::STM32F411CEUx
+  device-pack: Keil::STM32F4xx_DFP@2.17.1
+  device-books:
+    - name: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/Documentation/DM00119316.pdf
+      title: STM32F411xC/E Reference Manual
+    - name: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/Documentation/DM00115249.pdf
+      title: STM32F411xC/411xE Data Sheet
+    - name: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/Documentation/dui0553a_cortex_m4_dgug.pdf
+      title: Cortex-M4 Generic User Guide
+    - name: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/Documentation/DM00105879.pdf
+      title: STM32F4xx HAL Drivers
+    - name: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/Documentation/DM00104712.pdf
+      title: STM32CubeMX User Manual
+  dbgconf:
+    - file: ../../../.cmsis/project+Target_1.dbgconf
+      version: 0.0.0
+  processor:
+    endian: little
+    fpu: sp
+    core: Cortex-M4
+  packs:
+    - pack: ARM::CMSIS@6.3.0
+      path: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0
+    - pack: Keil::STM32F4xx_DFP@2.17.1
+      path: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1
+  optimize: debug
+  debug: on
+  misc:
+    ASM:
+      - -masm=auto
+    C:
+      - -std=c99
+      - -fno-rtti
+      - -funsigned-char
+      - -fshort-enums
+      - -fshort-wchar
+      - -ffunction-sections
+      - -Wall
+      - -Wextra
+      - -Wno-packed
+      - -Wno-reserved-id-macro
+      - -Wno-unused-macros
+      - -Wno-documentation-unknown-command
+      - -Wno-documentation
+      - -Wno-license-management
+      - -Wno-parentheses-equality
+    CPP:
+      - -xc++
+      - -std=c++11
+      - -fno-exceptions
+      - -fno-rtti
+      - -funsigned-char
+      - -fshort-enums
+      - -fshort-wchar
+      - -ffunction-sections
+      - -Wall
+      - -Wextra
+      - -Wno-packed
+      - -Wno-reserved-id-macro
+      - -Wno-unused-macros
+      - -Wno-documentation-unknown-command
+      - -Wno-documentation
+      - -Wno-license-management
+      - -Wno-parentheses-equality
+    Link:
+      - --map
+      - --load_addr_map_info
+      - --xref
+      - --callgraph
+      - --symbols
+      - --info sizes
+      - --info totals
+      - --info unused
+      - --info veneers
+      - --strict
+      - --summary_stderr
+      - --info summarysizes
+  define:
+    - STM32F411xE
+    - _RTE_
+  define-asm:
+    - STM32F411xE
+    - _RTE_
+  add-path:
+    - ../../../RTE/_Target_1
+    - ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+    - ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+  add-path-asm:
+    - ../../../RTE/_Target_1
+    - ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+    - ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+  output-dirs:
+    intdir: ../../../tmp
+    outdir: .
+    rtedir: ../../../RTE
+  output:
+    - type: elf
+      file: project.axf
+    - type: comp-db
+      file: compile_commands.json
+  components:
+    - component: ARM::CMSIS:CORE@6.2.0
+      condition: ARMv6_7_8-M Device
+      from-pack: ARM::CMSIS@6.3.0
+      selected-by: CMSIS:CORE
+      files:
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+          category: include
+          version: 6.2.0
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include/tz_context.h
+          category: header
+          version: 6.2.0
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Template/ARMv8-M/main_s.c
+          category: sourceC
+          attr: template
+          version: 1.1.1
+          select: Secure mode 'main' module for ARMv8-M
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Template/ARMv8-M/tz_context.c
+          category: sourceC
+          attr: template
+          version: 1.1.1
+          select: RTOS Context Management (TrustZone for ARMv8-M)
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Documentation/html/Core/index.html
+          category: doc
+          version: 6.2.0
+    - component: Keil::Device:Startup@2.6.3
+      condition: STM32F4 CMSIS
+      from-pack: Keil::STM32F4xx_DFP@2.17.1
+      selected-by: Device:Startup
+      files:
+        - file: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+          category: include
+          version: 2.6.3
+        - file: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h
+          category: header
+          version: 2.6.3
+        - file: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/MDK/Device/Source/ARM/STM32F411xx_OPT.s
+          category: source
+          attr: template
+          version: 2.6.3
+          select: Flash Option Bytes
+        - file: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/MDK/Device/Source/ARM/STM32F4xx_OTP.s
+          category: source
+          attr: template
+          version: 2.6.3
+          select: Flash One-Time programmable Bytes
+        - file: ../../../RTE/Device/STM32F411CEUx/startup_stm32f411xe.s
+          category: source
+          attr: config
+          version: 2.6.8
+        - file: ../../../RTE/Device/STM32F411CEUx/system_stm32f4xx.c
+          category: source
+          attr: config
+          version: 2.6.8
+  linker:
+    script: ../../../RTE/Device/STM32F411CEUx/ac6_linker_script.sct.src
+    regions: ../../../RTE/Device/STM32F411CEUx/regions_STM32F411CEUx.h
+  groups:
+    - group: src
+      files:
+        - file: ../../../src/main.asm
+          category: sourceAsm
+        - file: ../../../src/stm32f411.inc
+          category: other
+        - file: ../../../src/rcc.asm
+          category: sourceAsm
+        - file: ../../../src/port.asm
+          category: sourceAsm
+        - file: ../../../src/hardware_config.inc
+          category: other
+        - file: ../../../src/dio.asm
+          category: sourceAsm
+  constructed-files:
+    - file: ../../../RTE/_Target_1/RTE_Components.h
+      category: header
+  licenses:
+    - license: <unknown>
+      packs:
+        - pack: Keil::STM32F4xx_DFP@2.17.1
+      components:
+        - component: Keil::Device:Startup@2.6.3
+    - license: Apache-2.0
+      packs:
+        - pack: ARM::CMSIS@6.3.0
+      components:
+        - component: ARM::CMSIS:CORE@6.2.0

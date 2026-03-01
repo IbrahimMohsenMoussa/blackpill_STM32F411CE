@@ -1,0 +1,84 @@
+; STM32F411 Register Definitions
+; This file defines the base addresses, register offsets, and bit definitions for the STM32F411 microcontroller.
+;@author: Ibrahim Mohsen
+
+; --- Peripheral Bases ---
+RCC_BASE    EQU  0x40023800
+FLASH_BASE  EQU  0x40023C00
+PWR_BASE    EQU  0x40007000
+GPIOA_BASE  EQU  0x40020000
+GPIOC_BASE  EQU  0x40020800
+
+; --- RCC Register Offsets ---
+RCC_CR       EQU 0x00
+RCC_PLLCFGR  EQU 0x04
+RCC_CFGR     EQU 0x08
+RCC_AHB1ENR  EQU 0x30
+RCC_AHB2ENR  EQU 0x34
+RCC_APB1ENR  EQU 0x40
+RCC_APB2ENR  EQU 0x44
+
+; --- GPIO Register Offsets ---
+GPIO_MODER   EQU 0x00
+GPIO_OTYPER  EQU 0x04
+GPIO_OSPEEDR EQU 0x08
+GPIO_PUPDR   EQU 0x0C
+GPIO_IDR     EQU 0x10
+GPIO_ODR     EQU 0x14
+GPIO_BSRR    EQU 0x18
+GPIO_AFRL    EQU 0x20
+GPIO_AFRH    EQU 0x24
+
+; --- Flash Register Offsets ---
+FLASH_ACR    EQU 0x00
+
+; --- Power Register Offsets ---
+PWR_CR       EQU 0x00
+
+; --- Bit Definitions ---
+HSEON        EQU (1 :SHL: 16)
+HSERDY       EQU (1 :SHL: 17) 
+PLLON        EQU (1 :SHL: 24)
+PLLRDY       EQU (1 :SHL: 25)
+PWREN        EQU (1 :SHL: 28)
+
+; --- Peripheral Clock Enable Bits ---
+; AHB1 Peripherals
+RCC_AHB1_GPIOA EQU (1 :SHL: 0)
+RCC_AHB1_GPIOB EQU (1 :SHL: 1)
+RCC_AHB1_GPIOC EQU (1 :SHL: 2)
+RCC_AHB1_DMA1  EQU (1 :SHL: 21)
+RCC_AHB1_DMA2  EQU (1 :SHL: 22)
+; AHB2 Peripherals
+RCC_AHB2_OTGFS EQU (1 :SHL: 7)
+; APB1 Peripherals
+RCC_APB1_TIM2   EQU (1 :SHL: 0)
+RCC_APB1_TIM3   EQU (1 :SHL: 1)
+RCC_APB1_TIM4   EQU (1 :SHL: 2)
+RCC_APB1_TIM5   EQU (1 :SHL: 3)
+RCC_APB1_SPI2   EQU (1 :SHL: 14)
+RCC_APB1_SPI3   EQU (1 :SHL: 15)
+RCC_APB1_USART2 EQU (1 :SHL: 17)
+RCC_APB1_I2C1   EQU (1 :SHL: 21)
+RCC_APB1_I2C2   EQU (1 :SHL: 22)
+RCC_APB1_I2C3   EQU (1 :SHL: 23)
+RCC_APB1_PWR    EQU (1 :SHL: 28)
+
+; APB2 Peripherals
+RCC_APB2_TIM1   EQU (1 :SHL: 0)
+RCC_APB2_USART1 EQU (1 :SHL: 4)
+RCC_APB2_USART6 EQU (1 :SHL: 5)
+RCC_APB2_ADC1   EQU (1 :SHL: 8)
+RCC_APB2_SDIO   EQU (1 :SHL: 11)
+RCC_APB2_SPI1   EQU (1 :SHL: 12)
+RCC_APB2_SPI4   EQU (1 :SHL: 13)
+RCC_APB2_SYSCFG EQU (1 :SHL: 14)
+RCC_APB2_TIM9   EQU (1 :SHL: 16)
+RCC_APB2_TIM10  EQU (1 :SHL: 17)
+RCC_APB2_TIM11  EQU (1 :SHL: 18)
+RCC_APB2_SPI5   EQU (1 :SHL: 20)
+
+; --- Board Specific ---
+LED_PIN      EQU 13
+GPIO_PORT_OFFSET EQU 0x400
+    END

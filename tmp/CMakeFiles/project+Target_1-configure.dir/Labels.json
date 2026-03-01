@@ -1,0 +1,34 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/CMakeFiles/project+Target_1-configure"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/CMakeFiles/project+Target_1-configure.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-configure.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-patch.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-update.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-download.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-mkdir.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"project+Target_1"
+		],
+		"name" : "project+Target_1-configure"
+	}
+}

@@ -1,0 +1,6 @@
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1/CMakeFiles/database.dir
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1/CMakeFiles/project+Target_1.dir
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1/CMakeFiles/Group_src.dir
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1/CMakeFiles/Keil_Device_Startup_2_6_3.dir
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1/CMakeFiles/edit_cache.dir
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,12 @@
+# Target labels
+ project+Target_1
+# Source files and their labels
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/CMakeFiles/project+Target_1-executes
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/CMakeFiles/project+Target_1-executes.rule
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-executes.rule
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-build.rule
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-configure.rule
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-patch.rule
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-update.rule
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-download.rule
+/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-mkdir.rule

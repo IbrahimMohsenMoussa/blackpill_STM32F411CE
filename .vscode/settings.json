@@ -1,0 +1,15 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/out/project/Target_1"
+    ],
+    "ROS2.distro": "jazzy",
+    "python.autoComplete.extraPaths": [
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/debuggers.arm.armdbg/6.6.1/sw/osgi/plugins/com.arm.debug.interpreter.jython.api_6.6.1.202508041948",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "debug.hideSlowPreLaunchWarning": true,
+    "debug.showInStatusBar": "never"
+}

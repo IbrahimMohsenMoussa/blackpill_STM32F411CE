@@ -1,0 +1,38 @@
+[
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/main.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/main.asm",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/main.asm",
+  "output": "CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/main.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/rcc.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/rcc.asm",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/rcc.asm",
+  "output": "CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/rcc.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/port.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/port.asm",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/port.asm",
+  "output": "CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/port.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/dio.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/dio.asm",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/dio.asm",
+  "output": "CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/dio.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Keil_Device_Startup_2_6_3.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/startup_stm32f411xe.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/startup_stm32f411xe.s",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/startup_stm32f411xe.s",
+  "output": "CMakeFiles/Keil_Device_Startup_2_6_3.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/startup_stm32f411xe.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang --target=arm-arm-none-eabi -DSTM32F411xE -D_RTE_ -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -isystem /home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/include --target=arm-arm-none-eabi -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fcolor-diagnostics --target=arm-arm-none-eabi -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -std=c99 -fno-rtti -funsigned-char -fshort-enums -fshort-wchar -ffunction-sections -Wall -Wextra -Wno-packed -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -g -O1 -o CMakeFiles/Keil_Device_Startup_2_6_3.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/system_stm32f4xx.o -c /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/system_stm32f4xx.c",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/system_stm32f4xx.c",
+  "output": "CMakeFiles/Keil_Device_Startup_2_6_3.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/system_stm32f4xx.o"
+}
+]

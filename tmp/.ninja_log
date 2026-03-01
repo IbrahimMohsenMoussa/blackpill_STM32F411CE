@@ -1,0 +1,13 @@
+# ninja log v7
+1	8	1772394773046731189	project+Target_1/src/project+Target_1-stamp/project+Target_1-mkdir	b0d7dbe35ad89e0b
+1	8	1772394773046731189	/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-mkdir	b0d7dbe35ad89e0b
+9	15	1772394773052731406	project+Target_1/src/project+Target_1-stamp/project+Target_1-download	bf8b96863543e29f
+9	15	1772394773052731406	/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-download	bf8b96863543e29f
+15	20	1772394773058731623	project+Target_1/src/project+Target_1-stamp/project+Target_1-update	1828af836c1a6551
+15	20	1772394773058731623	/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-update	1828af836c1a6551
+21	26	1772394773063731804	project+Target_1/src/project+Target_1-stamp/project+Target_1-patch	2a36eb22aeec9093
+21	26	1772394773063731804	/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-patch	2a36eb22aeec9093
+26	281	1772394773318741028	project+Target_1/src/project+Target_1-stamp/project+Target_1-configure	3d6a788b364ff154
+26	281	1772394773318741028	/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-configure	3d6a788b364ff154
+281	298	1772394773319741064	project+Target_1/src/project+Target_1-stamp/project+Target_1-database	74f0db3fb998c827
+281	298	1772394773319741064	/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-database	74f0db3fb998c827

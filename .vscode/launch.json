@@ -1,0 +1,39 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "STLink@Arm-Debugger (launch)",
+            "type": "arm-debugger",
+            "request": "launch",
+            "connectionAddress": "*",
+            "connectionType": "ST-Link",
+            "programs": [
+                "${command:arm-debugger.getApplicationFiles}"
+            ],
+            "cmsisPack": "${command:cmsis-csolution.getDfpName}",
+            "deviceName": "${command:cmsis-csolution.getDeviceName}",
+            "processorName": "${command:cmsis-csolution.getProcessorName}",
+            "workspaceFolder": "${workspaceFolder}/",
+            "debugClockSpeed": "auto",
+            "debugPortMode": "auto",
+            "cmsis": {
+                "updateConfiguration": "auto"
+            }
+        },
+        {
+            "name": "Flash & Debug (OpenOCD)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceFolder}",
+            "executable": "${command:arm-debugger.getApplicationFiles}",
+            "device": "STM32F411CE",
+            "svdFile": "/home/ibrahim-mohsen/.platformio/platforms/ststm32/misc/svd/STM32F411xx.svd",
+            "gdbPath": "gdb-multiarch",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f4x.cfg"
+            ]
+        }
+    ]
+}

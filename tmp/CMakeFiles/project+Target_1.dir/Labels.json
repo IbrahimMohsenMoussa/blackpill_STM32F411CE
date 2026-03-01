@@ -1,0 +1,52 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/CMakeFiles/project+Target_1"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/CMakeFiles/project+Target_1.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/CMakeFiles/project+Target_1-complete.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-build.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-configure.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-database.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-download.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-executes.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-install.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-mkdir.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-patch.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-test.rule"
+		},
+		{
+			"file" : "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"project+Target_1"
+		],
+		"name" : "project+Target_1"
+	}
+}
