@@ -162,4 +162,5 @@ DIO_ToggleLogical PROC
                                 ; DIO_TogglePin will 'bx lr' directly to main!
     ENDP
 
+	ALIGN
     END

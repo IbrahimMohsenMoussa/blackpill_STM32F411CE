@@ -12,6 +12,8 @@
     IMPORT DIO_ReadLogical
     IMPORT PLLInit
     IMPORT GPIO_Init_All
+	IMPORT SysTick_Init
+	IMPORT SysTick_delay_ms
 
 delay_loop PROC
     subs r2, r2, #1
@@ -42,4 +44,5 @@ loop
     b loop
     ENDP
 
+	ALIGN
     END

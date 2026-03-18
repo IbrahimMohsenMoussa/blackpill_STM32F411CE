@@ -162,4 +162,5 @@ GPIO_Pin_Init PROC
     pop {r4-r8, pc}
     ENDP
 
+	ALIGN
     END
