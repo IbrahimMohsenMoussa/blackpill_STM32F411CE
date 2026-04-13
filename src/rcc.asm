@@ -1,8 +1,10 @@
     INCLUDE stm32f411.inc
+;==============================================================================
 ; rcc.asm - RCC (Reset and Clock Control) initialization for STM32F411
 ; This file contains functions to initialize the PLL to set the system clock to 100MHz using a 25MHz external crystal (HSE)
 ; It also includes functions to enable clocks for various peripherals on AHB1, AHB2, APB1, and APB2 buses.
 ;@Author: Ibrahim Mohsen
+;==============================================================================
 
 PLL_M      EQU (25 << 0)   ; M=25 (25MHz / 25 = 1MHz) @Bit 0-5
 PLL_N      EQU (200 << 6)  ; N=200 (1MHz * 200 = 200MHz) @Bit 6-14
@@ -10,8 +12,8 @@ PLL_P      EQU (0 << 16)   ; P=2 (200MHz / 2 = 100MHz) @Bit 16-17 (00 = /2)
 PLL_SRC    EQU (1 << 22)   ; HSE Source @Bit 22
 PLL_Q      EQU (4 << 24)   ; Q=4 (200MHz / 4 = 50MHz) @Bit 24-27
 RCC_PLLCFGR_VALUE EQU (PLL_M | PLL_N | PLL_P | PLL_SRC | PLL_Q) ; Combined PLL configuration value
-APB1_PRESCALER EQU (0x4 << 10)    ; PPRE1 = /2 (50MHz max for APB1)
-APB2_PRESCALER EQU (0x0 << 13)    ; PPRE2 = /1 (100MHz max for APB2)
+; APB1_PRESCALER EQU (0x4 << 10)    ; PPRE1 = /2 (50MHz max for APB1) commented byt spider man
+; APB2_PRESCALER EQU (0x0 << 13)    ; PPRE2 = /1 (100MHz max for APB2) commented byt spider man
 VOS_SCALE1   EQU (3 << 14) ; VOS = 0b11 for Scale 1 (required for 100MHz)
 FLASH_ACR_VALUE EQU 0x0703 ; 3 Wait States + Prefetch Enable + Instruction Cache Enable + Data Cache Enable
 
@@ -148,4 +150,5 @@ RCC_APB2_Enable PROC
     pop {r0-r3, pc}             ; Restore registers and return
     ENDP
 
+	ALIGN
     END

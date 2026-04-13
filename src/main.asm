@@ -2,6 +2,8 @@
 
     AREA |.data|, DATA, READWRITE
 var DCD 15
+; Using CMSIS register definitions logic.
+; wiggle wiggle wiggo
 
     INCLUDE stm32f411.inc
     INCLUDE hardware_config.inc
@@ -17,6 +19,8 @@ var DCD 15
     IMPORT DIO_WritePort
     
 
+	IMPORT SysTick_Init
+	IMPORT SysTick_delay_ms
 
 delay_loop PROC
     subs r2, r2, #1
@@ -52,4 +56,5 @@ loop
     pop{r3,pc}
     ENDP
 
+	ALIGN
     END
