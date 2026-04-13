@@ -1,0 +1,14 @@
+project.cbuild-idx.yml
+project.cproject.yml
+out/project/Target_1/compile_commands.json
+out/project/Target_1/project+Target_1.cbuild.yml
+src/rcc.asm
+tmp/.ninja_log
+tmp/1/.ninja_deps
+tmp/1/.ninja_log
+tmp/1/build.ninja
+tmp/1/compile_commands.json
+tmp/1/CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/main.o
+tmp/1/CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/rcc.o
+tmp/project+Target_1/groups.cmake
+tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-database-out.log

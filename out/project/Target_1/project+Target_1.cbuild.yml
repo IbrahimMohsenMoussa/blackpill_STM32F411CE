@@ -178,6 +178,8 @@ build:
           category: sourceAsm
         - file: ../../../src/i2ctest.asm
           category: sourceAsm
+        - file: ../../../src/SysTick.asm
+          category: sourceAsm
   constructed-files:
     - file: ../../../RTE/_Target_1/RTE_Components.h
       category: header

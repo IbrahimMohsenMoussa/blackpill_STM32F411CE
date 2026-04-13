@@ -58,3 +58,4 @@ project:
         - file: src/hardware_config.inc
         - file: src/dio.asm
         - file: src/i2ctest.asm
+        - file: src/SysTick.asm
