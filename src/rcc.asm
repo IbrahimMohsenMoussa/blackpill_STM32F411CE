@@ -12,8 +12,8 @@ PLL_P      EQU (0 << 16)   ; P=2 (200MHz / 2 = 100MHz) @Bit 16-17 (00 = /2)
 PLL_SRC    EQU (1 << 22)   ; HSE Source @Bit 22
 PLL_Q      EQU (4 << 24)   ; Q=4 (200MHz / 4 = 50MHz) @Bit 24-27
 RCC_PLLCFGR_VALUE EQU (PLL_M | PLL_N | PLL_P | PLL_SRC | PLL_Q) ; Combined PLL configuration value
-APB1_PRESCALER EQU (0x4 << 10)    ; PPRE1 = /2 (50MHz max for APB1) commented byt spider man
-APB2_PRESCALER EQU (0x0 << 13)    ; PPRE2 = /1 (100MHz max for APB2) commented byt spider man
+;APB1_PRESCALER EQU (0x4 << 10)    ; PPRE1 = /2 (50MHz max for APB1) commented byt spider man
+;APB2_PRESCALER EQU (0x0 << 13)    ; PPRE2 = /1 (100MHz max for APB2) commented byt spider man
 VOS_SCALE1   EQU (3 << 14) ; VOS = 0b11 for Scale 1 (required for 100MHz)
 FLASH_ACR_VALUE EQU 0x0703 ; 3 Wait States + Prefetch Enable + Instruction Cache Enable + Data Cache Enable
 
@@ -77,7 +77,7 @@ wait_pll
 
     ; 7. Set Bus Prescalers (APB1 must be <= 50MHz)
     ldr r1, [r0, #RCC_CFGR]     ; RCC_CFGR
-    orr r1, r1, #(APB1_PRESCALER :OR: APB2_PRESCALER)    ; PPRE1 = /2 (50MHz), PPRE2 = /1 (100MHz)
+    orr r1, r1, #(APB1_PRESCALER | APB2_PRESCALER)    ; PPRE1 = /2 (50MHz), PPRE2 = /1 (100MHz)
     str r1, [r0, #RCC_CFGR]
 
     ; 8. Switch System Clock to PLL
