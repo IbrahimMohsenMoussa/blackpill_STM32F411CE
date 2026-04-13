@@ -11,8 +11,8 @@ solution:
           images:
             - project-context: project
           debugger:
-            name: ST-Link@Arm-Debugger
-            clock-armdbg: auto
-            protocol-armdbg: auto
+            name: ST-Link@pyOCD
+            clock: 4000000
+            protocol: swd
   projects:
     - project: project.cproject.yml

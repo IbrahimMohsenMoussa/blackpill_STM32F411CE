@@ -27,10 +27,12 @@ cbuild-run:
     - file: ${CMSIS_PACK_ROOT}/Keil/STM32F4xx_DFP/2.17.1/CMSIS/SVD/STM32F411.svd
       type: svd
   debugger:
-    name: ST-Link@Arm-Debugger
+    name: ST-Link@pyOCD
+    protocol: swd
+    clock: 4000000
     dbgconf: ../.cmsis/project+Target_1.dbgconf
-    protocol-armdbg: auto
-    clock-armdbg: auto
+    gdbserver:
+      - port: 3333
   debug-vars:
     vars: |
       __var DbgMCU_CR      = 0x00000007;   // DBGMCU_CR: DBG_SLEEP, DBG_STOP, DBG_STANDBY

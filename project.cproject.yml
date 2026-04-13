@@ -57,3 +57,4 @@ project:
         - file: src/port.asm
         - file: src/hardware_config.inc
         - file: src/dio.asm
+        - file: src/i2ctest.asm

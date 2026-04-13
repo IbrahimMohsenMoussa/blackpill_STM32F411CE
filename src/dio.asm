@@ -16,6 +16,8 @@ DIO_Hardware_Map
     EXPORT DIO_WriteLogical
     EXPORT DIO_ReadLogical
     EXPORT DIO_ToggleLogical
+    EXPORT DIO_WritePort
+    EXPORT DIO_ReadPort
 
 ; ============================================================================
 ; void DIO_WritePin(uint32_t port_base, uint32_t pin, uint32_t state)
@@ -160,6 +162,19 @@ DIO_ToggleLogical PROC
     
     b DIO_TogglePin             ; Branch to the hardware driver (Tail Call)
                                 ; DIO_TogglePin will 'bx lr' directly to main!
+    ENDP
+; ============================================================================
+; Input: r0 = Port Base Address (e.g., 0x40020000 for GPIOA)
+; Input: r1 = 16 Bit value to be written to the port (Each bit corresponds to a pin)
+; ============================================================================
+DIO_WritePort PROC
+    ; The upper 16 bits of ODR are reserved and should not be modified.
+    strh r1, [r0, #GPIO_ODR]     ; Write the new port state to ODR
+    bx lr      ; return from function
+    ENDP
+DIO_ReadPort PROC
+    ldrh r0, [r0, #GPIO_IDR]     ; Read the 16-bit port state from IDR
+    bx lr                       ; Return from function
     ENDP
 
     END

@@ -1,17 +1,22 @@
 ; Assembly program for STM32F411 (Black Pill) to blink the onboard LED (PC13)
-; Using CMSIS register definitions logic.
+
+    AREA |.data|, DATA, READWRITE
+var DCD 15
 
     INCLUDE stm32f411.inc
     INCLUDE hardware_config.inc
     
     AREA |.text|, CODE, READONLY
     THUMB
-    EXPORT __main
+    EXPORT main
 
     IMPORT DIO_ToggleLogical
     IMPORT DIO_ReadLogical
     IMPORT PLLInit
     IMPORT GPIO_Init_All
+    IMPORT DIO_WritePort
+    
+
 
 delay_loop PROC
     subs r2, r2, #1
@@ -26,11 +31,14 @@ toggle_led PROC
     bl delay_loop 
     b loop
     ENDP
-
-__main PROC
+    
+main PROC
+    push{r3,lr}
     bl PLLInit
     bl GPIO_Init_All
-    
+    ldr r0,=var
+    ldr r7 , [r0]
+
 loop
     mov r0,#ID_BUTTON
     bl DIO_ReadLogical
@@ -39,7 +47,9 @@ loop
     cmp r1, #0
     beq toggle_led
     
+
     b loop
+    pop{r3,pc}
     ENDP
 
     END

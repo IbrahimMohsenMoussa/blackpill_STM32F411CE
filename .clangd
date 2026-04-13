@@ -1,6 +1,4 @@
 CompileFlags:
-  CompilationDatabase: >-
-    /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/out/project/Target_1
   Add:
     - "-D_ILP32=1\r\n"
     - "-D_USE_STATIC_INLINE=1\r\n"
@@ -417,3 +415,6 @@ CompileFlags:
     - '-I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include'
     - >-
       -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+  CompilationDatabase: >-
+    /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/out/project/Target_1
+If: {}

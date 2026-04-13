@@ -11,5 +11,6 @@
         "/opt/ros/jazzy/lib/python3.12/site-packages"
     ],
     "debug.hideSlowPreLaunchWarning": true,
-    "debug.showInStatusBar": "never"
+    "debug.showInStatusBar": "never",
+    "cortex-debug.variableUseNaturalFormat": false
 }

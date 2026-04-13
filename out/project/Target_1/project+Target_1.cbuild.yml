@@ -176,6 +176,8 @@ build:
           category: other
         - file: ../../../src/dio.asm
           category: sourceAsm
+        - file: ../../../src/i2ctest.asm
+          category: sourceAsm
   constructed-files:
     - file: ../../../RTE/_Target_1/RTE_Components.h
       category: header

@@ -165,7 +165,7 @@ const uint8_t APBPrescTable[8]  = {0, 0, 0, 0, 1, 2, 3, 4};
   * @retval None
   */
   #undef __FPU_USED
-  #define __FPU_USED 0
+  #define __FPU_USED 1
 void SystemInit(void)
 {
   /* FPU settings ------------------------------------------------------------*/

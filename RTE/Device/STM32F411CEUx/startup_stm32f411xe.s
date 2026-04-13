@@ -180,6 +180,17 @@ Reset_Handler    PROC
                  BX      R0
                  ENDP
 
+
+; --- Semihosting Bypass Stubs ---
+    EXPORT _sys_command_string
+
+_sys_command_string PROC
+    ; The C library calls this to get command line arguments.
+    ; Returning a non-zero value in R0 tells the library: 
+    ; "No command string is available, stop asking."
+    MOV R0, #1      
+    BX LR           ; Return to the C library initialization
+    ENDP
 ; Dummy Exception Handlers (infinite loops which can be modified)
 
 NMI_Handler     PROC
