@@ -66,8 +66,18 @@ PinConfigTable
 
 
     DCD     0x0F010000
+    
+    ; PB2 - Pin=2, Port=1(B), Mode=1(Out), OT=0, Spd=0, PUPD=0, AF=0
+    ; Hex: 0x0 2 1 1 0 0 0 0
+    DCD     0x02110000
+    ; PA8 - Pin=8, Port=0(A), Mode=1(Out), OT=0, Spd=0, PUPD=0, AF=0
+    ; Hex: 0x0 8 0 1 0 0 0 0
+    DCD     0x08010000
+    ; PB13 - Pin=D(13), Port=1(B), Mode=1(Out), OT=0, Spd=0, PUPD=0, AF=0
+    ; Hex: 0x0 D 1 1 0 0 0 0
+    DCD     0x0D110000
 
-
+   
 
     ; End of Table Terminator (Sentinel)
     DCD     0xFFFFFFFF    

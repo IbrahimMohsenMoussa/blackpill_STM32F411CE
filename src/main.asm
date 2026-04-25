@@ -27,6 +27,7 @@ CurrentFloor DCD FLOOR0_SP
 
     IMPORT DIO_ToggleLogical
     IMPORT DIO_ReadLogical
+    IMPORT DIO_WriteLogical
     IMPORT PLLInit
     IMPORT GPIO_Init_All
     IMPORT DIO_WritePort
@@ -34,6 +35,7 @@ CurrentFloor DCD FLOOR0_SP
 	IMPORT SysTick_delay_ms
     IMPORT Keys_init 
     IMPORT Decode_Keypad
+    IMPORT Read_Button_Values
     IMPORT ADC_Read_Channel
     IMPORT Stepper_Init
     IMPORT Stepper_Enable
@@ -42,18 +44,52 @@ CurrentFloor DCD FLOOR0_SP
     IMPORT TOF_Init
     IMPORT TOF_Read_Distance
 
+
 delay_loop PROC
     subs r2, r2, #1
     bne delay_loop
     bx lr 
     ENDP
+
+    ;input r1
+LED_ON_FLOOR PROC
+    ; Input: r0 = Floor Number (0, 1, or 2)
+    push {r4, lr}
+    mov r4, r0                  ; Save floor number
+
+    ; Turn off all floor LEDs first
+    mov r1, #0                  ; State = LOW
+    mov r0, #ID_LED_F0
+    bl DIO_WriteLogical
+    mov r1, #0                  
+    mov r0, #ID_LED_F1
+    bl DIO_WriteLogical
+    mov r1, #0                 
+    mov r0, #ID_LED_F2
+    bl DIO_WriteLogical
+
+    ; Turn on the specific floor LED
+    cmp r4, #0
+    moveq r0, #ID_LED_F0
+    cmp r4, #1
+    moveq r0, #ID_LED_F1
+    cmp r4, #2
+    moveq r0, #ID_LED_F2
     
+    mov r1, #1                  ; State = HIGH
+    bl DIO_WriteLogical
+
+    pop {r4, pc}
+
+
+ENDP
+
 
 main PROC
     b WAKEUP_STATE
-
+               ; Initialize GPIO pins for LED and other peripherals
 loop
-; shall never reach here 
+
     b loop
 	
     ENDP
@@ -217,15 +253,32 @@ idle_loop
     cmp r0, #'2'                ; Check if key '2' is pressed
     beq go_floor2
     
+
+    bl Read_Button_Values         
+    cmp r0, #0               ; Check if key '0' is pressed
+    beq go_floor0
+    cmp r0, #1            ; Check if key '1' is pressed
+    beq go_floor1
+    cmp r0, #2               ; Check if key '2' is pressed
+    beq go_floor2
+
+
+
     b idle_loop                 ; If any other key is pressed, ignore it
 
 go_floor0
+    mov r0, #0
+    bl LED_ON_FLOOR
     ldr r0, =FLOOR0_SP
     b START_MOTION_STATE
 go_floor1
+    mov r0, #1
+    bl LED_ON_FLOOR
     ldr r0, =FLOOR1_SP
     b START_MOTION_STATE
 go_floor2
+    mov r0, #2
+    bl LED_ON_FLOOR
     ldr r0, =FLOOR2_SP
     b START_MOTION_STATE
     ENDP

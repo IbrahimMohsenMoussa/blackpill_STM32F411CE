@@ -4,6 +4,7 @@
     IMPORT ADC_Read
     IMPORT ADC_Read_Channel
     EXPORT Keys_init 
+    EXPORT Read_Button_Values
 
 
     EXPORT Decode_Keypad
@@ -191,3 +192,48 @@ end_decode
               POP {r1, r2, PC}
               ENDP
 
+; ==========================================
+; Read Pin Values Function (Channel 9)
+; Returns 0, 1, or 2 based on ADC reading
+; ==========================================
+Read_Button_Values PROC
+              PUSH {r1, r2, LR}
+              MOV r0, #9               ; Set the ADC channel to 9
+              BL ADC_Read_Channel      ; Read the raw ADC value, returned in r0
+
+check_val_0
+              LDR r1, =0x799           ; 0x7FD - 100 (approx)
+              CMP r0, r1
+              BLO check_val_1
+              LDR r2, =0x861           ; 0x7FD + 100 (approx)
+              CMP r0, r2
+              BHI check_val_1
+              MOV r0, #0
+              B end_read_pins
+
+check_val_1
+              LDR r1, =0xF91           ; 0xFF5 - 100 (approx)
+              CMP r0, r1
+              BLO check_val_2
+              LDR r2, =0x1059          ; 0xFF5 + 100 (approx)
+              CMP r0, r2
+              BHI check_val_2
+              MOV r0, #1
+              B end_read_pins
+
+check_val_2
+              LDR r1, =0x4F0           ; 0x554 - 100 (approx)
+              CMP r0, r1
+              BLO no_valid_pin
+              LDR r2, =0x5B8           ; 0x554 + 100 (approx)
+              CMP r0, r2
+              BHI no_valid_pin
+              MOV r0, #2
+              B end_read_pins
+
+no_valid_pin
+              MOV r0, #0xFF            ; Return error/no match indicator
+
+end_read_pins
+              POP {r1, r2, PC}
+              ENDP

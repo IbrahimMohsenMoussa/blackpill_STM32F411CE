@@ -9,6 +9,10 @@ DIO_Hardware_Map
     DCD GPIOA_BASE, 0 ; Index 1: ID_BUTTON (Mapped to PA0 on the Black Pill)
     DCD GPIOB_BASE, 3 ; Index 2: ID_MOTOR_ENABLE (Mapped to PB3)
     DCD GPIOA_BASE, 15 ; Index 3: ID_MOTOR_DIR (Mapped to PA15)
+    DCD GPIOA_BASE, 8 ; Index 4: LED_F0
+    DCD GPIOB_BASE, 2 ; Index 5: LED_F1
+    DCD GPIOB_BASE, 13 ; Index 6: LED_F2
+    
 
     AREA |.text|, CODE, READONLY
     THUMB
