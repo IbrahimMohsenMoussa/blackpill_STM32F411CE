@@ -37,6 +37,36 @@
 },
 {
   "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/adc.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/adc.asm",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/adc.asm",
+  "output": "CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/adc.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/keypad.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/keypad.asm",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/keypad.asm",
+  "output": "CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/keypad.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/stepper.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/stepper.asm",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/stepper.asm",
+  "output": "CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/stepper.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/timer.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/timer.asm",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/timer.asm",
+  "output": "CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/timer.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
+  "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/tof400f_driver.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/tof400f_driver.s",
+  "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/tof400f_driver.s",
+  "output": "CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/tof400f_driver.o"
+},
+{
+  "directory": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/tmp/1",
   "command": "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang -I/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/_Target_1 -I/home/ibrahim-mohsen/.cache/arm/packs/ARM/CMSIS/6.3.0/CMSIS/Core/Include -I/home/ibrahim-mohsen/.cache/arm/packs/Keil/STM32F4xx_DFP/2.17.1/Drivers/CMSIS/Device/ST/STM32F4xx/Include -mcpu=Cortex-M4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard --target=arm-arm-none-eabi -c -mlittle-endian -masm=auto -g -O1 -Wa,armasm,--pd,\"STM32F411xE SETA 1\" -Wa,armasm,--pd,\"_RTE_ SETA 1\"  -c -o CMakeFiles/Keil_Device_Startup_2_6_3.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/startup_stm32f411xe.o /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/startup_stm32f411xe.s",
   "file": "/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/startup_stm32f411xe.s",
   "output": "CMakeFiles/Keil_Device_Startup_2_6_3.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/RTE/Device/STM32F411CEUx/startup_stm32f411xe.o"

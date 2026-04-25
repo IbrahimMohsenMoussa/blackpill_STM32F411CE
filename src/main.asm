@@ -17,10 +17,17 @@ var DCD 15
     IMPORT PLLInit
     IMPORT GPIO_Init_All
     IMPORT DIO_WritePort
-    
-
 	IMPORT SysTick_Init
 	IMPORT SysTick_delay_ms
+    IMPORT Keys_init 
+    IMPORT Decode_Keypad
+    IMPORT ADC_Read_Channel
+    IMPORT Stepper_Init
+    IMPORT Stepper_Enable
+    IMPORT Stepper_SetDirection
+    IMPORT Stepper_SetSpeed
+    IMPORT TOF_Init
+    IMPORT TOF_Read_Distance
 
 delay_loop PROC
     subs r2, r2, #1
@@ -36,25 +43,58 @@ toggle_led PROC
     b loop
     ENDP
     
-main PROC
-    push{r3,lr}
-    bl PLLInit
-    bl GPIO_Init_All
-    ldr r0,=var
-    ldr r7 , [r0]
+; main PROC
+;     push{r3,lr}
+;     bl PLLInit
+;     bl GPIO_Init_All
+;     bl Keys_init 
+;     bl Stepper_Init
+;     bl Stepper_Enable           ; Enable the stepper motor driver
+; loop 
+  
+;     BL Decode_Keypad            ; Decode the ADC value, ASCII character returned in r0
 
-loop
-    mov r0,#ID_BUTTON
-    bl DIO_ReadLogical
-    mov r1, r0
-    mov r0, #ID_STATUS_LED
-    cmp r1, #0
-    beq toggle_led
+;     CMP r0, #'1'                ; Check if key '1' is pressed
+;     BEQ move_up
     
+;     CMP r0, #'2'                ; Check if key '2' is pressed
+;     BEQ move_down
+    
+;     ; If neither '1' nor '2' is pressed, stop the motor
+;     MOV r0, #0                  ; 0 Hz = Stop
+;     BL Stepper_SetSpeed
+;     B loop
 
+; move_up
+;     MOV r0, #0                  ; Set Direction 0 (Upward/Clockwise)
+;     BL Stepper_SetDirection
+;     LDR r0, =5000                ; Low speed (500 steps/sec)
+;     BL Stepper_SetSpeed
+;     B loop
+    
+; move_down
+;     MOV r0, #1                  ; Set Direction 1 (Downward/Counter-Clockwise)
+;     BL Stepper_SetDirection
+;     LDR r0, =5000                ; Low speed (500 steps/sec)
+;     BL Stepper_SetSpeed
+;     B loop
+main PROC
+                
+    bl PLLInit                   ; Initialize PLL to set system clock to 100 MHz
+    bl GPIO_Init_All             ; Initialize GPIO pins based on PinConfigTable
+    bl TOF_Init                  ; Initialize TOF400F laser ranging module
+    bl SysTick_Init              ; Initialize SysTick for delay functions
+    bl Keys_init                   ; Initialize ADC for keypad reading
+    ;bl Stepper_Init              ; Initialize Timer 3 for stepper control
+    ;bl Stepper_Enable            ; Enable the stepper motor driver
+loop
+    bl TOF_Read_Distance         ; Read distance from TOF sensor, result in r0
+    ; --- THE FIX: Pace the Modbus Polling ---
+    mov r5, r0                  ; Move distance reading to r1 for potential use
+    bl Keys_init                   ; Re-initialize ADC to get a fresh reading for the keypad
+    bl Decode_Keypad              ; Decode the ADC value, ASCII character returned in r0
+
+    
     b loop
-    pop{r3,pc}
-    ENDP
-
 	ALIGN
     END

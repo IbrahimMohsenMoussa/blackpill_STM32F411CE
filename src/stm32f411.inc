@@ -6,6 +6,8 @@
 RCC_BASE    EQU  0x40023800
 FLASH_BASE  EQU  0x40023C00
 PWR_BASE    EQU  0x40007000
+TIM3_BASE   EQU  0x40000400
+TIM2_BASE   EQU  0x40000000
 GPIOA_BASE  EQU  0x40020000
 GPIOB_BASE  EQU  0x40020400
 GPIOC_BASE  EQU  0x40020800
@@ -184,6 +186,30 @@ APB2_DIV_FACTOR         EQU     16
 AHB_FREQ                EQU     (F_CPU / AHB_DIV_FACTOR)
 APB1_FREQ               EQU     (AHB_FREQ / APB1_DIV_FACTOR)
 APB2_FREQ               EQU     (AHB_FREQ / APB2_DIV_FACTOR)
+
+
+;=========================================================
+; ADC Register Definitions
+;=========================================================
+
+ADC1_BASE     EQU 0x40012000
+ADC_SR        EQU 0x00
+ADC_CR2       EQU 0x08
+ADC_SQR3      EQU 0x34
+ADC_DR        EQU 0x4C
+
+;=========================================================
+; TIM Register Definitions
+;=========================================================
+TIM_CR1       EQU 0x00
+TIM_SR        EQU 0x10
+TIM_EGR       EQU 0x14
+TIM_CNT       EQU 0x24
+TIM_PSC       EQU 0x28
+TIM_ARR       EQU 0x2C
+TIM_CCMR1     EQU 0x18
+TIM_CCER      EQU 0x20
+TIM_CCR1      EQU 0x34
 
 ; --- Board Specific ---
 LED_PIN      EQU 13

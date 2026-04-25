@@ -43,6 +43,32 @@ PinConfigTable
     DCD     0x06121214
     ; I2C1 SDA (PB7) - Pin=7, Port=1(B), Mode=2(AF), OT=1(OD), Spd=2, PUPD=1(PU), AF=4
     DCD     0x07121214
+    ; PB0 - Pin=0, Port=1(B), Mode=3(Analog), OT=0, Spd=0, PUPD=0, AF=0
+    ; Hex: 0x0 0 1 3 0 0 0 0
+    DCD     0x00130000
+    ; PB1 - Pin=1, Port=1(B), Mode=3(Analog), OT=0, Spd=0, PUPD=0, AF=0
+    ; Hex: 0x0 1 1 3 0 0 0 0
+    DCD     0x01130000
+    ; PB4 - Pin=4, Port=1(B), Mode=2(AF), OT=0, Spd=2, PUPD=0, AF=2 (TIM3_CH1)
+    ; Hex: 0x0 4 1 2 0 2 0 2
+    DCD     0x04120202
+    ; PB3 - Pin=3, Port=1(B), Mode=1(Out), OT=0, Spd=0, PUPD=0, AF=0 (Motor Enable)
+    ; Hex: 0x0 3 1 1 0 0 0 0
+    DCD     0x03110000
+    ; PA15 - Pin=F(15), Port=0(A), Mode=1(Out), OT=0, Spd=0, PUPD=0, AF=0 (Motor DIR)
+    ; Hex: 0x0 F 0 1 0 0 0 0
+    ; PA11 - Pin=B(11), Port=0(A), Mode=2(AF), OT=0, Spd=3(High), PUPD=0, AF=8 (USART6_TX)
+    ; Hex: 0x0 B 0 2 0 3 0 8
+    DCD     0x0B020308
+    ; PA12 - Pin=C(12), Port=0(A), Mode=2(AF), OT=0, Spd=3(High), PUPD=0, AF=8 (USART6_RX)
+    ; Hex: 0x0 C 0 2 0 3 0 8
+    DCD     0x0C020308
+
+
+    DCD     0x0F010000
+
+
+
     ; End of Table Terminator (Sentinel)
     DCD     0xFFFFFFFF    
 

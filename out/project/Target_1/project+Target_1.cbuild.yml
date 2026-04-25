@@ -180,6 +180,16 @@ build:
           category: sourceAsm
         - file: ../../../src/SysTick.asm
           category: sourceAsm
+        - file: ../../../src/adc.asm
+          category: sourceAsm
+        - file: ../../../src/keypad.asm
+          category: sourceAsm
+        - file: ../../../src/stepper.asm
+          category: sourceAsm
+        - file: ../../../src/timer.asm
+          category: sourceAsm
+        - file: ../../../src/tof400f_driver.s
+          category: sourceAsm
   constructed-files:
     - file: ../../../RTE/_Target_1/RTE_Components.h
       category: header

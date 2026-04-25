@@ -13,4 +13,4 @@ build-idx:
         info:
           - project.cbuild-pack.yml - file is already up-to-date
           - project+Target_1.cbuild-run.yml - file is already up-to-date
-          - project+Target_1.cbuild.yml - file is already up-to-date
+          - project+Target_1.cbuild.yml - file generated successfully
