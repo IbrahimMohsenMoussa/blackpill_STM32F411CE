@@ -127,7 +127,8 @@ TIM3_PWM_Init PROC
     mov r1, #1
     str r1, [r0, #TIM_CCER]
     
-    ; Enable TIM3
+    ; Enable TIM3 and enable Auto-Reload Preload (ARPE = Bit 7, CEN = Bit 0)
+    mov r1, #0x81
     str r1, [r0, #TIM_CR1]
     
     pop {r4, pc}

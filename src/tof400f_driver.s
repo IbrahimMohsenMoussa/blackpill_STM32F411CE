@@ -85,12 +85,17 @@ cmd_end
 ; ----------------------------------------------------------------------------
 TOF_Read_Distance PROC
    
-    push    {r4-r7, lr}
+    push    {r4-r8, lr}
     ldr     r4, =USART6_BASE
     
-    ; --- NEW: Flush any stale garbage out of the RX hardware buffer ---
-    ldr     r7, [r4, #USART_SR]      ; Dummy read Status Register
-    ldr     r7, [r4, #USART_DR]      ; Dummy read Data Register to clear RXNE flag
+    ; --- Flush ALL stale garbage out of the RX hardware buffer ---
+flush_rx
+    ldr     r7, [r4, #USART_SR]
+    tst     r7, #RXNE_BIT
+    beq     rx_flushed              ; Buffer is completely empty
+    ldr     r7, [r4, #USART_DR]     ; Read Data Register to clear RXNE flag
+    b       flush_rx
+rx_flushed
 
     ; --- Phase 1: Transmit Modbus Command ---
     ldr     r5, =tof400f_read_cmd
@@ -98,7 +103,10 @@ TOF_Read_Distance PROC
 tx_loop
     cmp     r5, r6
     beq     rx_phase                ; If array end reached, branch to receive
+    ldr     r8, =200000             ; TX timeout (~10ms)
 wait_txe
+    subs    r8, r8, #1
+    beq     timeout_error           ; Abort if TX hardware hangs
     ldr     r7, [r4, #USART_SR]
     tst     r7, #TXE_BIT            ; Poll TXE
     beq     wait_txe
@@ -113,7 +121,10 @@ rx_phase
 rx_loop
     cmp     r6, #0
     beq     parse_data
+    ldr     r8, =2000000            ; RX timeout (~100ms for sensor process time)
 wait_rxne
+    subs    r8, r8, #1
+    beq     timeout_error           ; Abort if RX hangs/drops byte
     ldr     r7, [r4, #USART_SR]
     tst     r7, #RXNE_BIT           ; Poll RXNE
     beq     wait_rxne
@@ -126,13 +137,30 @@ parse_data
     ; --- Phase 3: Extract Distance (mm) ---
     ; Expected response format: [01] [03] [02] [High Byte] [Low Byte] [CRC_H] [CRC_L]
     ldr     r5, =rx_buffer
+    ldrb    r0, [r5, #0]            ; Validate Slave ID (0x01)
+    cmp     r0, #0x01
+    bne     timeout_error           ; Reject packet if out of sync
+    
+    ldrb    r0, [r5, #1]            ; Validate Function Code (0x03)
+    cmp     r0, #0x03
+    bne     timeout_error           ; Reject packet if out of sync
+    
+    ldrb    r0, [r5, #2]            ; Validate Byte Count (0x02)
+    cmp     r0, #0x02
+    bne     timeout_error           ; Reject packet if out of sync
+
+    ldr     r5, =rx_buffer
     ldrb    r0, [r5, #3]            ; Load High Byte (Index 3)
     ldrb    r1, [r5, #4]            ; Load Low Byte (Index 4)
     
     lsl     r0, r0, #8              ; Shift High Byte to MSB
     orr     r0, r0, r1              ; Bitwise OR with Low Byte
     
-    pop     {r4-r7, pc}             ; Return with distance in R0
+    pop     {r4-r8, pc}             ; Return with distance in R0
+
+timeout_error
+    ldr     r0, =0xFFFFFFFF         ; Return specific error code on timeout
+    pop     {r4-r8, pc}
     ENDP
 
     END
