@@ -7,5 +7,5 @@ events:
       - "/home/ibrahim-mohsen/.vcpkg/artifacts/2139c4c6/tools.kitware.cmake/3.31.5/share/cmake-3.31/Modules/CMakeDetermineSystem.cmake:205 (message)"
       - "CMakeLists.txt:4 (project)"
     message: |
-      The system is: Linux - 6.17.0-19-generic - x86_64
+      The system is: Linux - 6.17.0-22-generic - x86_64
 ...

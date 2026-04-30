@@ -51,16 +51,21 @@ project:
   groups:
     - group: src
       files:
-        - file: src/main.asm
         - file: src/stm32f411.inc
         - file: src/rcc.asm
         - file: src/port.asm
         - file: src/hardware_config.inc
         - file: src/dio.asm
-        - file: src/i2ctest.asm
         - file: src/SysTick.asm
         - file: src/adc.asm
         - file: src/keypad.asm
         - file: src/stepper.asm
         - file: src/timer.asm
         - file: src/tof400f_driver.s
+        - file: src/i2c.asm
+        - file: src/rtc_driver.asm
+        - file: src/font.inc
+        - file: src/sh1106_driver.s
+        - file: src/bitmaps.asm
+        - file: src/main.asm
+        - file: src/ui_driver.s

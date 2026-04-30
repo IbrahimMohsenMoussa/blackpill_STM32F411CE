@@ -4,9 +4,23 @@
 FLOOR0_SP EQU 100
 FLOOR1_SP EQU 360
 FLOOR2_SP EQU 650
+; ====================================================================
+; State Machine Constants
+; ====================================================================
+
+; --- System States ---
+STATE_IDLE      EQU     0       ; Waiting for RFID
+STATE_AUTH      EQU     1       ; RFID Scanned, waiting for keypad
+STATE_MOVING    EQU     2       ; Motor active, en route to target
+
+; --- UI Floor Definitions ---
+; Prefixed with UI_ to prevent collisions with PI loop setpoints
+UI_FLOOR_0      EQU     0       ; Ground Floor (UI Graphic mapping)
+UI_FLOOR_1      EQU     1       ; First Floor (UI Graphic mapping)
+UI_FLOOR_2      EQU     2       ; Second Floor (UI Graphic mapping)
 
 CL_KI EQU 2 ; Closed Loop KI value for speed control (tune as needed)
-CL_KP EQU 28; Closed Loop KP value for speed control (tune as needed)
+CL_KP EQU 35; Closed Loop KP value for speed control (tune as needed)
     AREA |.data|, DATA, READWRITE
 CurrentFloor DCD FLOOR0_SP
 
@@ -43,6 +57,15 @@ CurrentFloor DCD FLOOR0_SP
     IMPORT Stepper_SetSpeed
     IMPORT TOF_Init
     IMPORT TOF_Read_Distance
+    IMPORT I2C1_Init
+    IMPORT RTC_Init
+    IMPORT OLED_Init
+    IMPORT OLED_ClearBuffer
+    IMPORT UI_Init
+    IMPORT UI_SetCurrentFloor
+    IMPORT UI_SetTargetFloor
+    IMPORT UI_SetSystemState
+    IMPORT UI_Update
 
 
 delay_loop PROC
@@ -88,10 +111,69 @@ ENDP
 main PROC
     b WAKEUP_STATE
                ; Initialize GPIO pins for LED and other peripherals
-loop
+    bl PLLInit                   ; initialize PLL to restore system clock
+    bl GPIO_Init_All             ; initialize GPIO pins
+    bl Stepper_Init              ; initialize Timer 3 for stepper control
+    bl Stepper_Enable            ; enable TMC2209 stepper driver Lock the stepper shaft 
+    bl TOF_Init                  ; initialize TOF400F module
+    bl SysTick_Init              ; initialize SysTick timer
+    bl Keys_init                 ; initialize ADC for keypad and Floor calling buttons 
+    bl I2C1_Init                   ; initialize I2C1 for OLED communication
+    bl RTC_Init                   ; initialize RTC for timekeeping (if needed for future features)
 
-    b loop
-	
+    ldr r2,=10000000
+    bl delay_loop                 ; Short delay to ensure all peripherals are stable before OLED initialization
+
+    bl OLED_Init                  ; initialize SH1106 OLED display
+    bl UI_Init                     ; initialize UI elements on OLED
+    bl UI_Update                   ; update OLED with initial UI state
+loop
+    ; Test Loop for UI Driver
+    ; Cycle through states and floors to verify display logic
+    
+    ; State 0: IDLE, Floor 0
+    mov     r0, #0
+    bl      UI_SetSystemState
+    mov     r0, #0
+    bl      UI_SetCurrentFloor
+    bl      UI_Update
+    ldr     r2, =20000000
+    bl      delay_loop
+
+    ; State 1: AUTH, Floor 0
+    mov     r0, #1
+    bl      UI_SetSystemState
+    bl      UI_Update
+    ldr     r2, =20000000
+    bl      delay_loop
+
+    ; State 2: MOVING, Target Floor 2, Current Floor 0 (Up Arrow)
+    mov     r0, #2
+    bl      UI_SetSystemState
+    mov     r0, #2
+    bl      UI_SetTargetFloor
+    bl      UI_Update
+    ldr     r2, =20000000
+    bl      delay_loop
+
+    ; Update Current Floor to 1 while moving
+    mov     r0, #1
+    bl      UI_SetCurrentFloor
+    bl      UI_Update
+    ldr     r2, =20000000
+    bl      delay_loop
+
+    ; Arrived at Floor 2, Back to IDLE
+    mov     r0, #2
+    bl      UI_SetCurrentFloor
+    mov     r0, #0
+    bl      UI_SetSystemState
+    bl      UI_Update
+    ldr     r2, =20000000
+    bl      delay_loop
+
+    
+	b loop 
     ENDP
 
 
@@ -100,17 +182,20 @@ loop
 WAKEUP_STATE PROC
     ; This function is called on wakeup from sleep mode.
     ; It should reinitialize any peripherals that were turned off before sleeping.
-    bl PLLInit                   ; Reinitialize PLL to restore system clock
-    bl GPIO_Init_All             ; Reinitialize GPIO pins
-    bl TOF_Init                  ; Reinitialize TOF400F module
-    bl SysTick_Init              ; Reinitialize SysTick timer
-    bl Keys_init                   ; Reinitialize ADC for keypad
-    bl Stepper_Init              ; Reinitialize Timer 3 for stepper control
-    bl Stepper_Enable            ; Re-enable the stepper motor driver
+
+    bl PLLInit                   ; initialize PLL to restore system clock
+    
+    bl GPIO_Init_All             ; initialize GPIO pins
+    bl Stepper_Init              ; initialize Timer 3 for stepper control
+    bl Stepper_Enable            ; enable TMC2209 stepper driver Lock the stepper shaft 
+   
+    bl TOF_Init                  ; initialize TOF400F module
+    bl SysTick_Init              ; initialize SysTick timer
+    bl Keys_init                 ; initialize ADC for keypad and Floor calling buttons 
    
 
     ldr r0, =FLOOR1_SP
-    b START_MOTION_STATE
+    b START_MOTION_STATE ; hand off to motion states to move to floor 1 as a Statrt 
     ENDP
 
 
@@ -120,7 +205,7 @@ START_MOTION_STATE PROC
      ;lock current door , update oled , wait 2 seconds 
 
      ldr r0,=2000
-     bl SysTick_delay_ms
+     bl SysTick_delay_ms ;Wait 2 seconds for clearance before moving
      pop {r0}                   ; Restore target floor
      b MOVING_STATE
     ENDP
@@ -131,7 +216,7 @@ START_MOTION_STATE PROC
 MOVING_STATE PROC
     mov r5, r0 
     mov r9, #0                  ; r9 = Integral Accumulator (Initialize to 0)
-    mov r11, #0                 ; r11 = Missed Frame Counter (Initialize to 0)
+   ; mov r11, #0                 ; r11 = Missed Frame Counter (Initialize to 0)
     mov r12, #0                 ; r12 = Current Speed (Initialize to 0)
 loop_moving
     push {r5, r9, r11, r12}     ; Defensively save state registers
@@ -163,7 +248,7 @@ valid_reading
     
     ; --- Update Integral Accumulator with Anti-Windup ---
     add r9, r9, r6              ; Accumulator += Error
-    ldr r10, =500              ; Positive clamp limit (reduced to prevent windup)
+    ldr r10, =500              ; Positive clamp limit 
     cmp r9, r10
     it gt
     movgt r9, r10
@@ -199,10 +284,10 @@ valid_reading
     ble apply_speed             ; If decelerating or steady, let PI handle it directly
     
     subs r10, r7, r12           ; Calculate speed difference (acceleration)
-    cmp r10, #100               ; Compare with max acceleration step (100 Hz/loop)
+    cmp r10, #150               ; Compare with max acceleration step (150 Hz/loop)
     ble apply_speed             ; If within limits, apply desired speed
     
-    add r7, r12, #100           ; Otherwise, cap the speed to current + 100
+    add r7, r12, #150           ; Otherwise, cap the speed to current + 150
     
 apply_speed
     mov r12, r7                 ; Store new speed as current speed for next loop iteration

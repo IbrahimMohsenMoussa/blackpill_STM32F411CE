@@ -164,8 +164,6 @@ build:
   groups:
     - group: src
       files:
-        - file: ../../../src/main.asm
-          category: sourceAsm
         - file: ../../../src/stm32f411.inc
           category: other
         - file: ../../../src/rcc.asm
@@ -175,8 +173,6 @@ build:
         - file: ../../../src/hardware_config.inc
           category: other
         - file: ../../../src/dio.asm
-          category: sourceAsm
-        - file: ../../../src/i2ctest.asm
           category: sourceAsm
         - file: ../../../src/SysTick.asm
           category: sourceAsm
@@ -189,6 +185,20 @@ build:
         - file: ../../../src/timer.asm
           category: sourceAsm
         - file: ../../../src/tof400f_driver.s
+          category: sourceAsm
+        - file: ../../../src/i2c.asm
+          category: sourceAsm
+        - file: ../../../src/rtc_driver.asm
+          category: sourceAsm
+        - file: ../../../src/font.inc
+          category: other
+        - file: ../../../src/sh1106_driver.s
+          category: sourceAsm
+        - file: ../../../src/bitmaps.asm
+          category: sourceAsm
+        - file: ../../../src/main.asm
+          category: sourceAsm
+        - file: ../../../src/ui_driver.s
           category: sourceAsm
   constructed-files:
     - file: ../../../RTE/_Target_1/RTE_Components.h

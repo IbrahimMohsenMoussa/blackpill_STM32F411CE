@@ -88,6 +88,13 @@ TOF_Read_Distance PROC
     push    {r4-r8, lr}
     ldr     r4, =USART6_BASE
     
+    ; --- Modbus Idle Time (3.5 char minimum) ---
+    ; Prevent back-to-back queries from violating Modbus RTU spec
+    ldr     r7, =100000             ; ~3ms delay loop
+idle_delay
+    subs    r7, r7, #1
+    bne     idle_delay
+
     ; --- Flush ALL stale garbage out of the RX hardware buffer ---
 flush_rx
     ldr     r7, [r4, #USART_SR]
@@ -103,7 +110,7 @@ rx_flushed
 tx_loop
     cmp     r5, r6
     beq     rx_phase                ; If array end reached, branch to receive
-    ldr     r8, =200000             ; TX timeout (~10ms)
+    ldr     r8, =2000000            ; TX timeout (~100ms)
 wait_txe
     subs    r8, r8, #1
     beq     timeout_error           ; Abort if TX hardware hangs
@@ -121,7 +128,7 @@ rx_phase
 rx_loop
     cmp     r6, #0
     beq     parse_data
-    ldr     r8, =2000000            ; RX timeout (~100ms for sensor process time)
+    ldr     r8, =20000000           ; RX timeout (~1s for sensor process time)
 wait_rxne
     subs    r8, r8, #1
     beq     timeout_error           ; Abort if RX hangs/drops byte

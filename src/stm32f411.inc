@@ -6,6 +6,7 @@
 RCC_BASE    EQU  0x40023800
 FLASH_BASE  EQU  0x40023C00
 PWR_BASE    EQU  0x40007000
+RTC_BASE    EQU  0x40002800
 TIM3_BASE   EQU  0x40000400
 TIM2_BASE   EQU  0x40000000
 GPIOA_BASE  EQU  0x40020000
@@ -20,6 +21,7 @@ RCC_AHB1ENR  EQU 0x30
 RCC_AHB2ENR  EQU 0x34
 RCC_APB1ENR  EQU 0x40
 RCC_APB2ENR  EQU 0x44
+RCC_BDCR     EQU 0x70
 
 ; --- GPIO Register Offsets ---
 GPIO_MODER   EQU 0x00
@@ -210,6 +212,17 @@ TIM_ARR       EQU 0x2C
 TIM_CCMR1     EQU 0x18
 TIM_CCER      EQU 0x20
 TIM_CCR1      EQU 0x34
+
+;=========================================================
+; RTC Register Definitions
+;=========================================================
+RTC_TR        EQU 0x00
+RTC_DR        EQU 0x04
+RTC_CR        EQU 0x08
+RTC_ISR       EQU 0x0C
+RTC_PRER      EQU 0x10
+RTC_WPR       EQU 0x24
+RTC_BKP0R     EQU 0x50
 
 ; --- Board Specific ---
 LED_PIN      EQU 13
