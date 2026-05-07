@@ -73,3 +73,5 @@ project:
         - file: src/DFPlayer.s
         - file: src/UART1.s
         - file: src/UART1_defs.s
+        - file: src/exti.asm
+        - file: src/brakes.asm

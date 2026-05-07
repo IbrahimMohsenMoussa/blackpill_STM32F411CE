@@ -1,221 +1,129 @@
-    INCLUDE stm32f411.inc
-; ====================================================================
-; SysTick Driver for ARM Cortex-M
-; APIs: SysTick_Init, SysTick_delay_ms, SysTick_delay_us
-; @Author : Spider Man
-; ====================================================================
+;==============================================================================
+; SysTick RTOS Heartbeat Driver
+; @Description: Refactored continuous heartbeat for RTOS timekeeping.
+; Removes blocking polling modes in favor of a continuous 1ms background 
+; interrupt tick that tracks global uptime and manages a 200ms display scheduler.
+;==============================================================================
 
-; --------------------------------------------------------------------
-; SysTick Register Definitions
-; --------------------------------------------------------------------
-SYSTICK_BASE            EQU     0xE000E010
+SYSTICK_BASE    EQU     0xE000E010
+SYSTICK_CTRL    EQU     0x00
+SYSTICK_LOAD    EQU     0x04
+SYSTICK_VAL     EQU     0x08
 
-SYSTICK_CTRL            EQU     SYSTICK_BASE + 0x00
-SYSTICK_LOAD            EQU     SYSTICK_BASE + 0x04
-SYSTICK_VAL             EQU     SYSTICK_BASE + 0x08
-SYSTICK_CALIB           EQU     SYSTICK_BASE + 0x0C
-
-; Bit definitions for SYSTICK_CTRL register
-SYSTICK_CTRL_ENABLE_BIT         EQU     0
-SYSTICK_CTRL_TICKINT_BIT        EQU     1
-SYSTICK_CTRL_CLKSOURCE_BIT      EQU     2
-SYSTICK_CTRL_COUNTFLAG_BIT      EQU     16
-
-
-; SysTick clock = AHB/8 = 2 MHz (for greater delay range)
-SYSTICK_CLK_FREQ        EQU     (AHB_FREQ / 8)  ; 12.5 MHz
-SYSTICK_CLK_PERIOD_NS   EQU     (1000000000 / SYSTICK_CLK_FREQ) ; 80 ns
-	
-SYSTICK_MAX_TICKS       EQU     0x00FFFFFF
-SEC_TO_mSEC             EQU     1000
-SEC_TO_uSEC             EQU     1000000
-MAX_TIME_mSEC			EQU		1342	; MAX_TIME_mSEC = (SYSTICK_MAX_TICKS * SEC_TO_mSEC) / F_SYSTICK
-										; = (0x00FFFFFF * 1000) / 12,500,000 = ~1,342.18 ms
-MAX_TIME_uSEC			EQU		1342177	; MAX_TIME_uSEC = (SYSTICK_MAX_TICKS * SEC_TO_uSEC) / F_SYSTICK
-										; = (0x00FFFFFF * 1,000,000) / 12,500,000 = ~1,342,177.28 us
-; --------------------------------------------------------------------
-; Exported Procedures
-; --------------------------------------------------------------------
-    AREA |.text|, CODE, READONLY
-    THUMB
-    EXPORT  SysTick_Init
-    EXPORT  SysTick_delay_ms
-    EXPORT  SysTick_delay_us
-
-; --------------------------------------------------------------------
-; SysTick_Init
-; Initializes SysTick timer to use AHB/8 clock (12.5 MHz)
-; Input: None
-; Output: None
-; --------------------------------------------------------------------
-SysTick_Init PROC
-    PUSH    {R0, LR}
-    
-    ; Disable SysTick first
-    LDR     R0, =SYSTICK_CTRL
-    LDR     R1, [R0]
-    BIC     R1, R1, #(1 << SYSTICK_CTRL_ENABLE_BIT)
-    STR     R1, [R0]
-    
-    ; Clear current value
-    LDR     R0, =SYSTICK_VAL
-    MOV     R1, #0
-    STR     R1, [R0]
-    
-    ; Set clock source to AHB/8 (clear CLKSOURCE bit)
-    LDR     R0, =SYSTICK_CTRL
-    LDR     R1, [R0]
-    BIC     R1, R1, #(1 << SYSTICK_CTRL_CLKSOURCE_BIT)
-    STR     R1, [R0]
-    
-    ; Disable interrupt (we're using polling)
-    BIC     R1, R1, #(1 << SYSTICK_CTRL_TICKINT_BIT)
-    STR     R1, [R0]
-    
-    POP     {R0, PC}
-    ENDP
-
-; --------------------------------------------------------------------
-; SysTick_Start (Equivalent to SYSTICK_voidStart)
-; Input: R0 = LoadValue (ticks)
-; --------------------------------------------------------------------
-SysTick_Start PROC
-    ; Load required number of ticks
-    SUBS    R0, R0, #1       ; Counts from LOAD to 0
-    LDR     R1, =SYSTICK_LOAD
-    STR     R0, [R1]
-    
-    ; Clear current value and COUNTFLAG
-    LDR     R1, =SYSTICK_VAL
-    MOV     R0, #0
-    STR     R0, [R1]
-    
-    ; Start the timer
-    LDR     R1, =SYSTICK_CTRL
-    LDR     R0, [R1]
-    ORR     R0, R0, #(1 << SYSTICK_CTRL_ENABLE_BIT)
-    STR     R0, [R1]
-    
-    BX      LR
-    ENDP
-
-; --------------------------------------------------------------------
-; SysTick_delay_ms (Equivalent to SYSTICK_voidDelay_ms)
-; Input: R0 = time_in_ms
-; --------------------------------------------------------------------
-SysTick_delay_ms PROC
-    PUSH    {R4, LR}
-    MOV     R4, R0           ; Save time_in_ms
-    
-delay_ms_loop
-    LDR     R1, =MAX_TIME_mSEC
-    CMP     R4, R1
-    BLS     delay_ms_final
-    
-    ; Handle values above maximum
-    SUB     R4, R4, R1       ; time_in_ms -= MAX_TIME_mSEC
-    
-    ; Count max possible ticks
-    LDR     R0, =SYSTICK_MAX_TICKS
-    BL      SysTick_Start
-    
-    ; Wait for count flag
-    LDR     R1, =SYSTICK_CTRL
-wait_ms_loop1
-    LDR     R2, [R1]
-    TST     R2, #(1 << SYSTICK_CTRL_COUNTFLAG_BIT)
-    BEQ     wait_ms_loop1
-    
-    ; Stop timer
-    LDR     R1, =SYSTICK_CTRL
-    LDR     R2, [R1]
-    BIC     R2, R2, #(1 << SYSTICK_CTRL_ENABLE_BIT)
-    STR     R2, [R1]
-    
-    B       delay_ms_loop
-
-delay_ms_final
-    ; Calculate ticks: ((SYSTICK_CLK_FREQ/SEC_TO_mSEC) * time_in_ms) - 1
-    ; = (12500 * time_in_ms) - 1
-    LDR     R0, =12500
-    MUL     R0, R4, R0
-    SUBS    R0, R0, #1
-    
-    BL      SysTick_Start
-    
-    ; Wait for count flag
-    LDR     R1, =SYSTICK_CTRL
-wait_ms_loop2
-    LDR     R2, [R1]
-    TST     R2, #(1 << SYSTICK_CTRL_COUNTFLAG_BIT)
-    BEQ     wait_ms_loop2
-    
-    ; Stop timer
-    LDR     R1, =SYSTICK_CTRL
-    LDR     R2, [R1]
-    BIC     R2, R2, #(1 << SYSTICK_CTRL_ENABLE_BIT)
-    STR     R2, [R1]
-    
-    POP     {R4, PC}
-    ENDP
-
-; --------------------------------------------------------------------
-; SysTick_delay_us (Equivalent to SYSTICK_voidDelay_us)
-; Input: R0 = time_in_us
-; --------------------------------------------------------------------
-SysTick_delay_us PROC
-    PUSH    {R4, LR}
-    MOV     R4, R0           ; Save time_in_us
-    
-delay_us_loop
-    LDR     R1, =MAX_TIME_uSEC
-    CMP     R4, R1
-    BLS     delay_us_final
-    
-    ; Handle values above maximum
-    SUB     R4, R4, R1       ; time_in_us -= MAX_TIME_uSEC
-    
-    ; Count max possible ticks
-    LDR     R0, =SYSTICK_MAX_TICKS
-    BL      SysTick_Start
-    
-    ; Wait for count flag
-    LDR     R1, =SYSTICK_CTRL
-wait_us_loop1
-    LDR     R2, [R1]
-    TST     R2, #(1 << SYSTICK_CTRL_COUNTFLAG_BIT)
-    BEQ     wait_us_loop1
-    
-    ; Stop timer
-    LDR     R1, =SYSTICK_CTRL
-    LDR     R2, [R1]
-    BIC     R2, R2, #(1 << SYSTICK_CTRL_ENABLE_BIT)
-    STR     R2, [R1]
-    
-    B       delay_us_loop
-
-delay_us_final
-    ; Calculate ticks: ((F_SYSTICK/SEC_TO_uSEC) * time_in_us) - 1
-    ; = (2 * time_in_us) - 1
-    LSL     R0, R4, #1       ; Multiply by 2
-    SUBS    R0, R0, #1
-    
-    BL      SysTick_Start
-    
-    ; Wait for count flag
-    LDR     R1, =SYSTICK_CTRL
-wait_us_loop2
-    LDR     R2, [R1]
-    TST     R2, #(1 << SYSTICK_CTRL_COUNTFLAG_BIT)
-    BEQ     wait_us_loop2
-    
-    ; Stop timer
-    LDR     R1, =SYSTICK_CTRL
-    LDR     R2, [R1]
-    BIC     R2, R2, #(1 << SYSTICK_CTRL_ENABLE_BIT)
-    STR     R2, [R1]
-    
-    POP     {R4, PC}
-    ENDP
+    ; ========================================================================
+    ; Global RAM Variables (.bss Section)
+    ; ========================================================================
+    AREA |.bss|, DATA, READWRITE
     ALIGN
+Global_Tick_ms          SPACE 4     ; 32-bit absolute system time counter
+RTOS_Display_Counter    SPACE 4     ; 32-bit countdown for display updates
+
+    ; ========================================================================
+    ; Code Section
+    ; ========================================================================
+    AREA |.text|, CODE, READONLY, ALIGN=2
+    THUMB
+
+    EXPORT SysTick_Init
+    EXPORT SysTick_delay_ms
+    EXPORT SysTick_Handler
+    
+    ; Import the external display update flag from main
+    IMPORT Sys_Display_Needs_Update
+
+; ----------------------------------------------------------------------------
+; SysTick_Init
+; Configures the timer to run continuously with a 1ms interrupt.
+; ----------------------------------------------------------------------------
+SysTick_Init PROC
+    PUSH    {R0-R2, LR}
+    
+    LDR     R0, =SYSTICK_BASE
+    
+    ; 1. Program Reload Value (12499 for exactly 1ms tick at 12.5 MHz AHB/8)
+    LDR     R1, =12499
+    STR     R1, [R0, #SYSTICK_LOAD]
+    
+    ; 2. Clear Current Value register
+    MOV     R1, #0
+    STR     R1, [R0, #SYSTICK_VAL]
+    
+    ; 3. Initialize Global Counters for the RTOS Heartbeat
+    LDR     R2, =Global_Tick_ms
+    STR     R1, [R2]                ; Zero out Global_Tick_ms
+    
+    LDR     R2, =RTOS_Display_Counter
+    MOV     R1, #200
+    STR     R1, [R2]                ; Initialize display countdown to 200ms
+    
+    ; 4. Write to CTRL: Enable Timer (Bit 0), Enable Interrupt (Bit 1), AHB/8 (Bit 2 = 0)
+    MOV     R1, #3                  
+    STR     R1, [R0, #SYSTICK_CTRL]
+    
+    POP     {R0-R2, PC}
+    ENDP
+
+; ----------------------------------------------------------------------------
+; SysTick_Handler (ISR)
+; The core RTOS heartbeat interrupt firing every 1ms.
+; ----------------------------------------------------------------------------
+SysTick_Handler PROC
+    PUSH    {R0-R3, LR}             ; Protect caller registers
+    
+    ; 1. Increment the absolute global time counter
+    LDR     R0, =Global_Tick_ms
+    LDR     R1, [R0]
+    ADD     R1, R1, #1
+    STR     R1, [R0]
+    
+    ; 2. Decrement the 200ms display scheduler
+    LDR     R0, =RTOS_Display_Counter
+    LDR     R1, [R0]
+    SUBS    R1, R1, #1
+    STR     R1, [R0]
+    
+    ; Check if display counter hit 0 (Z-flag set by SUBS)
+    BNE     SysTick_Handler_Done    
+    
+    ; 3. Reload display counter with 200ms
+    MOV     R1, #200
+    STR     R1, [R0]
+    
+    ; 4. Flag the main loop that the display needs to be updated
+    LDR     R2, =Sys_Display_Needs_Update
+    MOV     R3, #1
+    STRB    R3, [R2]                ; Write 1 to the external byte flag
+
+SysTick_Handler_Done
+    POP     {R0-R3, PC}             ; Return from exception (EXC_RETURN via PC)
+    ENDP
+
+; ----------------------------------------------------------------------------
+; SysTick_delay_ms
+; Non-blocking polling delay utilizing the new continuous global time tick.
+; Input: R0 = requested delay in milliseconds
+; ----------------------------------------------------------------------------
+SysTick_delay_ms PROC
+    PUSH    {R1-R3, LR}
+    
+    LDR     R1, =Global_Tick_ms
+    
+    ; Read Start Time
+    LDR     R2, [R1]
+
+delay_loop
+    ; Read Current Time
+    LDR     R3, [R1]
+    
+    ; Calculate Elapsed = Current Time - Start Time
+    ; (Unsigned subtraction inherently handles the 32-bit overflow rollover seamlessly)
+    SUBS    R3, R3, R2
+    
+    ; Check if Elapsed < Requested (R0)
+    CMP     R3, R0
+    BLO     delay_loop              ; Continue polling if not yet completed
+    
+    POP     {R1-R3, PC}
+    ENDP
+
     END

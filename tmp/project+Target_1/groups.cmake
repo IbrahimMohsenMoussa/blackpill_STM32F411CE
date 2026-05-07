@@ -21,6 +21,8 @@ add_library(Group_src OBJECT
   "${SOLUTION_ROOT}/src/DFPlayer.s"
   "${SOLUTION_ROOT}/src/UART1.s"
   "${SOLUTION_ROOT}/src/UART1_defs.s"
+  "${SOLUTION_ROOT}/src/exti.asm"
+  "${SOLUTION_ROOT}/src/brakes.asm"
 )
 target_include_directories(Group_src PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
@@ -188,5 +190,21 @@ set(COMPILE_DEFINITIONS
 )
 cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
 set_source_files_properties("${SOLUTION_ROOT}/src/UART1_defs.s" PROPERTIES
+  COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
+)
+set(COMPILE_DEFINITIONS
+  STM32F411xE
+  _RTE_
+)
+cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
+set_source_files_properties("${SOLUTION_ROOT}/src/exti.asm" PROPERTIES
+  COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
+)
+set(COMPILE_DEFINITIONS
+  STM32F411xE
+  _RTE_
+)
+cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
+set_source_files_properties("${SOLUTION_ROOT}/src/brakes.asm" PROPERTIES
   COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
 )

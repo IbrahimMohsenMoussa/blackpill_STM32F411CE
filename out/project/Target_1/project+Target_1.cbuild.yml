@@ -208,6 +208,10 @@ build:
           category: sourceAsm
         - file: ../../../src/UART1_defs.s
           category: sourceAsm
+        - file: ../../../src/exti.asm
+          category: sourceAsm
+        - file: ../../../src/brakes.asm
+          category: sourceAsm
   constructed-files:
     - file: ../../../RTE/_Target_1/RTE_Components.h
       category: header

@@ -19,11 +19,13 @@ UI_FLOOR_0      EQU     0       ; Ground Floor (UI Graphic mapping)
 UI_FLOOR_1      EQU     1       ; First Floor (UI Graphic mapping)
 UI_FLOOR_2      EQU     2       ; Second Floor (UI Graphic mapping)
 
-CL_KI EQU 2 ; Closed Loop KI value for speed control (tune as needed)
-CL_KP EQU 25; Closed Loop KP value for speed control (tune as needed)
+CL_KI EQU 2 ; Closed Loop KI value for speed control 
+CL_KP EQU 25; Closed Loop KP value for speed control 
     AREA |.data|, DATA, READWRITE
 CurrentFloor DCD FLOOR0_SP
-
+Sys_Display_Needs_Update DCD 0
+    EXPORT Sys_Display_Needs_Update
+    
 
 
 
