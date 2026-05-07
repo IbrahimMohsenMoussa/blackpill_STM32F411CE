@@ -166,4 +166,5 @@ set_zero_freq
     pop {r4, pc}
     ENDP
 
+	ALIGN    ; This fixes A1581W
     END

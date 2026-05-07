@@ -170,4 +170,6 @@ timeout_error
     pop     {r4-r8, pc}
     ENDP
 
+	ALIGN
     END
+	

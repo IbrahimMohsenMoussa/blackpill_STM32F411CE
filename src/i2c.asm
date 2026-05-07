@@ -222,4 +222,5 @@ i2c_stop_force
     pop     {r4, pc}
     ENDP
 
+	ALIGN
     END
