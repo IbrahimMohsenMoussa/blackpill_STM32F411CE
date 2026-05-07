@@ -1,47 +1,51 @@
-; Assembly program for STM32F411 (Black Pill) to blink the onboard LED (PC13)
+; ==============================================================================
+; main.asm
+; RTOS State Machine & Main Event Loop Router
+; ==============================================================================
 
+    ; --- State Definitions ---
+STATE_IDLE      equ 0
+STATE_START     equ 1
+STATE_MOVING    equ 2
+STATE_STOP      equ 3
+STATE_EMERGENCY equ 4
 
-FLOOR0_SP EQU 52
-FLOOR1_SP EQU 360
-FLOOR2_SP EQU 650
-; ====================================================================
-; State Machine Constants
-; ====================================================================
+    ; --- Floor Position Constants ---
+FLOOR0_SP       equ 52
+FLOOR1_SP       equ 360
+FLOOR2_SP       equ 650
 
-; --- System States ---
-STATE_IDLE      EQU     0       ; Waiting for RFID
-STATE_AUTH      EQU     1       ; RFID Scanned, waiting for keypad
-STATE_MOVING    EQU     2       ; Motor active, en route to target
+    ; --- Control Loop Constants ---
+CL_KP           equ 28
+CL_KI           equ 2
 
-; --- UI Floor Definitions ---
-; Prefixed with UI_ to prevent collisions with PI loop setpoints
-UI_FLOOR_0      EQU     0       ; Ground Floor (UI Graphic mapping)
-UI_FLOOR_1      EQU     1       ; First Floor (UI Graphic mapping)
-UI_FLOOR_2      EQU     2       ; Second Floor (UI Graphic mapping)
-
-CL_KI EQU 2 ; Closed Loop KI value for speed control 
-CL_KP EQU 25; Closed Loop KP value for speed control 
-    AREA |.data|, DATA, READWRITE
-CurrentFloor DCD FLOOR0_SP
-Sys_Display_Needs_Update DCD 0
-    EXPORT Sys_Display_Needs_Update
-    
-
-
-
-
-
-; Using CMSIS register definitions logic.
-; wiggle wiggle wiggo
+    ; ==============================================================================
+    ; SRAM Variables
+    ; ==============================================================================
+    area |.bss|, DATA, READWRITE
+    align 4
 
     INCLUDE stm32f411.inc
     INCLUDE hardware_config.inc
-    
-    AREA |.text|, CODE, READONLY
-    THUMB
-    EXPORT main
+System_State             space 1
+Sys_Emergency_Flag       space 1
+Sys_Power_Restored       space 1
+Sys_Display_Needs_Update space 1
+Current_Target_Floor     space 4
 
-    IMPORT DIO_ToggleLogical
+    ; Export required variable(s) for external drivers
+    export Sys_Display_Needs_Update
+
+    ; ==============================================================================
+    ; Main Application Code
+    ; ==============================================================================
+    area |.text|, CODE, READONLY, ALIGN=2
+    thumb
+    
+    EXPORT main
+    
+    ; --- Hardware & Subsystem Imports ---
+   IMPORT DIO_ToggleLogical
     IMPORT DIO_ReadLogical
     IMPORT DIO_WriteLogical
     IMPORT PLLInit
@@ -66,21 +70,371 @@ Sys_Display_Needs_Update DCD 0
     IMPORT UI_Init
     IMPORT UI_SetCurrentFloor
     IMPORT UI_SetTargetFloor
-    IMPORT UI_SetSystemState
+   
     IMPORT UI_Update
     IMPORT UI_TargetFloor
     IMPORT UI_CurrentFloor
+    IMPORT UI_Update_Chunked
     IMPORT DFP_Init
     IMPORT DFP_PlayImmediate
+    IMPORT brakes_on
+    IMPORT brakes_off
+    IMPORT EXTI_Pin_Init
+main
 
+    ; 1. Set up initial system state
+    ldr r0, =System_State
+    movs r1, #STATE_IDLE
+    strb r1, [r0]
 
-delay_loop PROC
-    subs r2, r2, #1
-    bne delay_loop
-    bx lr 
-    ENDP
+    ; 2. Hardware Initialization Sequence
+    bl PLLInit
 
-    ;input r1
+    bl GPIO_Init_All
+    bl RTC_Init
+    bl SysTick_Init
+    mov     r0, #500
+    bl      SysTick_delay_ms
+    bl brakes_on
+    bl TOF_Init
+    bl I2C1_Init
+    bl OLED_Init
+    bl UI_Init
+    bl DFP_Init
+    bl Keys_init
+    bl Stepper_Init
+    bl Stepper_Enable
+    
+
+    ; Initialize PB8 EXTI (Power Monitor)
+    movs r0, #1      ; r0 = Port B (1)
+    movs r1, #8      ; r1 = Pin 8
+    movs r2, #2      ; r2 = Trigger configuration
+    bl EXTI_Pin_Init
+
+    ; ==============================================================================
+    ; Main Event Router (RTOS Scheduler)
+    ; ==============================================================================
+main_loop
+    ; --- Priority 1: Emergency Preemption (Highest) ---
+    ldr r0, =Sys_Emergency_Flag
+    ldrb r1, [r0]
+    cmp r1, #1
+    beq.w EXECUTE_EMERGENCY
+
+    ; --- Priority 2: Core State Machine ---
+    ldr r0, =System_State
+    ldrb r1, [r0]
+    
+    cmp r1, #STATE_IDLE
+    beq.w EXECUTE_IDLE
+    cmp r1, #STATE_START
+    beq.w EXECUTE_START
+    cmp r1, #STATE_MOVING
+    beq.w EXECUTE_MOVING
+    cmp r1, #STATE_STOP
+    beq.w EXECUTE_STOP
+
+    ; --- Priority 3: Background UI Task (Lowest) ---
+    ldr r0, =Sys_Display_Needs_Update
+    ldrb r1, [r0]
+    cmp r1, #1
+    bne loop_restart
+
+    ; Crucial RTOS Protection: Do not block CPU for UI while moving
+    ldr r0, =System_State
+    ldrb r1, [r0]
+    cmp r1, #STATE_MOVING
+    beq loop_restart
+
+    bl UPDATE_DISPLAY_ROUTINE
+
+loop_restart
+    b main_loop
+
+    ; ==============================================================================
+    ; Subsystem Stubs
+    ; ==============================================================================
+EXECUTE_EMERGENCY
+    push {r0-r3, lr}
+    movs r0, #5
+    bl DFP_PlayImmediate
+EMERGENCY_TRAP
+    b EMERGENCY_TRAP
+
+EXECUTE_MOVING
+    ldr r5, =Current_Target_Floor
+    ldr r5, [r5]
+    movs r9, #0
+    movs r11, #0
+    movs r12, #0
+
+loop_moving
+    ; --- Preemption Check ---
+    ldr r0, =Sys_Emergency_Flag
+    ldrb r1, [r0]
+    cmp r1, #1
+    beq EXECUTE_EMERGENCY
+
+    ; --- Read Distance ---
+    push {r5, r9, r11, r12}
+    bl TOF_Read_Distance
+    pop {r5, r9, r11, r12}
+
+    ; Check for sensor error (0xFFFFFFFF)
+    ldr r1, =0xFFFFFFFF
+    cmp r0, r1
+    beq loop_moving
+
+    movs r11, #0
+    mov r4, r0
+    sub r6, r5, r4
+
+    ; Absolute error into R7
+    cmp r6, #0
+    ite mi
+    rsbmi r7, r6, #0
+    movpl r7, r6
+
+    ; Deadband check
+    cmp r7, #10
+    blt within_deadband
+
+    ; Integral Accumulator
+    add r9, r9, r6
+    
+    ; Clamp Integral
+    ldr r1, =500
+    cmp r9, r1
+    it gt
+    movgt r9, r1
+    ldr r1, =-500
+    cmp r9, r1
+    it lt
+    movlt r9, r1
+
+    ; P-Term and I-Term
+    ldr r1, =CL_KP
+    mul r1, r6, r1
+    ldr r2, =CL_KI
+    sdiv r2, r9, r2
+    add r7, r1, r2
+
+    ; Direction and Abs Speed
+    cmp r7, #0
+    ite ge
+    movge r0, #1
+    movlt r0, #0
+    it lt
+    rsblt r7, r7, #0
+
+    ; Speed Clamps
+    cmp r7, #16
+    it lt
+    movlt r7, #16
+    ldr r1, =7000
+    cmp r7, r1
+    it gt
+    movgt r7, r1
+
+    ; Soft Starter
+    cmp r7, r12
+    ble skip_soft_start
+    sub r1, r7, r12
+    cmp r1, #95
+    ble skip_soft_start
+    add r7, r12, #95
+skip_soft_start
+
+    ; Apply Speed
+    mov r12, r7
+
+    push {r5, r7, r9, r11, r12}
+    bl Stepper_SetDirection
+    pop {r5, r7, r9, r11, r12}
+
+    push {r5, r7, r9, r11, r12}
+    mov r0, r7
+    bl Stepper_SetSpeed
+    pop {r5, r7, r9, r11, r12}
+
+   ; Quick Display Update Hack inside the tight loop
+    ldr r0, =Sys_Display_Needs_Update
+    ldrb r1, [r0]
+    cmp r1, #1
+    bne skip_display
+    
+    ; Protect r4 as well, since we are reading it for the distance map
+    push {r4, r5, r7, r9, r11, r12}
+    
+    ; --- LIVE UI BUFFER UPDATE ---
+    ; r4 contains the live TOF distance in mm.
+    ; Compare against spatial midpoints to determine the UI floor graphic.
+    cmp r4, #206
+    blt live_floor_0
+    ldr r1, =505
+    cmp r4, r1
+    blt live_floor_1
+    b live_floor_2
+
+live_floor_0
+    movs r0, #0
+    b update_ui_buffer
+live_floor_1
+    movs r0, #1
+    b update_ui_buffer
+live_floor_2
+    movs r0, #2
+
+update_ui_buffer
+    ; Call the UI subroutine to actually draw the new floor to SRAM
+    bl UI_SetCurrentFloor    
+
+    ; Now that the SRAM buffer has live data, push 1 page of it to the OLED
+    bl UI_Update_Chunked    
+    
+    pop {r4, r5, r7, r9, r11, r12}
+    
+    ldr r0, =Sys_Display_Needs_Update
+    movs r1, #0
+    strb r1, [r0]
+skip_display
+
+    b loop_moving
+
+within_deadband
+    ldr r0, =System_State
+    movs r1, #STATE_STOP
+    strb r1, [r0]
+    b loop_restart
+
+EXECUTE_STOP
+    push {r0-r3, lr}
+    bl brakes_on
+    
+    ldr r1, =Current_Target_Floor
+    ldr r1, [r1]
+    
+    ldr r2, =FLOOR0_SP
+    cmp r1, r2
+    beq STOP_FLOOR_0
+    
+    ldr r2, =FLOOR1_SP
+    cmp r1, r2
+    beq STOP_FLOOR_1
+    
+    ldr r2, =FLOOR2_SP
+    cmp r1, r2
+    beq STOP_FLOOR_2
+    
+    b STOP_DONE
+
+EXECUTE_IDLE
+    ; --- 1. Check Inside Cabin Keypad ---
+    bl Decode_Keypad       ; Returns ASCII in r0, or 0 if none
+    cmp r0, #'0'
+    beq IDLE_FLOOR_0
+    cmp r0, #'1'
+    beq IDLE_FLOOR_1
+    cmp r0, #'2'
+    beq IDLE_FLOOR_2
+
+    ; --- 2. Check External Hall Calling Buttons ---
+    bl Read_Button_Values  ; Returns 0, 1, 2, or 0xFF
+    cmp r0, #0
+    beq IDLE_FLOOR_0
+    cmp r0, #1
+    beq IDLE_FLOOR_1
+    cmp r0, #2
+    beq IDLE_FLOOR_2
+
+    ; --- 3. Nothing Pressed (e.g., 0xFF) ---
+    b IDLE_END
+
+IDLE_FLOOR_0
+    ldr r1, =Current_Target_Floor
+    ldr r2, =FLOOR0_SP
+    str r2, [r1]
+    movs r0, #0
+    bl UI_SetTargetFloor
+    movs r0, #0            ; Turn on physical LED
+    bl LED_ON_FLOOR
+    b IDLE_TRANSITION
+
+IDLE_FLOOR_1
+    ldr r1, =Current_Target_Floor
+    ldr r2, =FLOOR1_SP
+    str r2, [r1]
+    movs r0, #1
+    bl UI_SetTargetFloor
+    movs r0, #1            ; Turn on physical LED
+    bl LED_ON_FLOOR
+    b IDLE_TRANSITION
+
+IDLE_FLOOR_2
+    ldr r1, =Current_Target_Floor
+    ldr r2, =FLOOR2_SP
+    str r2, [r1]
+    movs r0, #2
+    bl UI_SetTargetFloor
+    movs r0, #2            ; Turn on physical LED
+    bl LED_ON_FLOOR
+    b IDLE_TRANSITION
+
+IDLE_TRANSITION
+    ldr r1, =System_State
+    movs r2, #STATE_START
+    strb r2, [r1]          ; State transition triggers next cycle execution
+
+IDLE_END
+    b loop_restart
+
+EXECUTE_START
+    push {r0-r3, lr}
+    bl brakes_off
+    bl Stepper_Enable
+    
+    ; Transition to MOVING state
+    ldr r1, =System_State
+    movs r2, #STATE_MOVING
+    strb r2, [r1]
+    
+    pop {r0-r3, lr}
+    b loop_restart
+
+STOP_FLOOR_0
+    movs r0, #1
+    bl DFP_PlayImmediate
+    b STOP_DONE
+
+STOP_FLOOR_1
+    movs r0, #2
+    bl DFP_PlayImmediate
+    b STOP_DONE
+
+STOP_FLOOR_2
+    movs r0, #3
+    bl DFP_PlayImmediate
+    b STOP_DONE
+
+STOP_DONE
+    ; Transition back to IDLE so we can take new calls
+    ldr r0, =System_State
+    movs r1, #STATE_IDLE
+    strb r1, [r0]
+    pop {r0-r3, lr}
+    b loop_restart
+
+UPDATE_DISPLAY_ROUTINE 
+    push {lr}
+    bl UI_Update
+    ldr r0, =Sys_Display_Needs_Update
+    movs r1, #0
+    strb r1, [r0]
+    pop {pc}   
+
+    
+
 LED_ON_FLOOR PROC
     ; Input: r0 = Floor Number (0, 1, or 2)
     push {r4, lr}
@@ -109,263 +463,6 @@ LED_ON_FLOOR PROC
     bl DIO_WriteLogical
 
     pop {r4, pc}
-
-
-ENDP
-
-
-main PROC
-    ldr r2,=10000000
-    bl delay_loop                 ; Short delay to ensure stable power before initialization
-    bl PLLInit                   ; initialize PLL to restore system clock
-    bl GPIO_Init_All             ; initialize GPIO pins
-    
-   ; bl TOF_Init                  ; initialize TOF400F module
-    bl SysTick_Init              ; initialize SysTick timer
-   ; bl Keys_init                 ; initialize ADC for keypad and Floor calling buttons 
-   ; bl I2C1_Init                 ; initialize I2C1 for OLED communication
-  ;  bl RTC_Init                  ; initialize RTC for timekeeping (if needed for future features)\   ldr r2,=10000000
-                 ; Short delay to ensure all peripherals are stable before OLED initialization
-
-   ; bl OLED_Init                  ; initialize SH1106 OLED display
-   ; bl UI_Init                     ; initialize UI elements on OLED
-   ; bl Stepper_Init              ; initialize Timer 3 for stepper control
-    ;bl Stepper_Enable            ; enable TMC2209 stepper driver Lock the stepper shaft 
-    bl DFP_Init                  ; initialize DFPlayer Mini for audio feedback
-   ; b WAKEUP_STATE
-loop
-
-    ; Loop that plays tracks 1 to 5 with 3-second delays
-    mov     r4, #1               ; Start with Track 1
-track_loop
-    mov     r0, r4
-    bl      DFP_PlayImmediate    ; Play current track
-    
-    ldr     r0, =3000            ; 3000ms delay
-    bl      SysTick_delay_ms
-    
-    add     r4, r4, #1           ; Increment track number
-    cmp     r4, #6               ; Check if we finished track 5
-    blt     track_loop           ; If r4 < 6, continue loop
-    
-    b       loop                 ; Repeat the entire sequence
-   ; Plays track 1, waits 3 seconds, plays track 2, waits 3 seconds, loops.
-    mov r0, #1                   ; TRACK_GROUND
-    bl DFP_PlayImmediate
-    ldr r0, =10000
-    bl SysTick_delay_ms
-    
-    mov r0, #2                   ; TRACK_FIRST
-    bl DFP_PlayImmediate
-    ldr r0, =10000
-    bl SysTick_delay_ms
-    b loop
-    ENDP
-
-
-
-
-WAKEUP_STATE PROC
-   
-
-    ldr r0, =FLOOR1_SP
-    b START_MOTION_STATE ; hand off to motion states to move to floor 1 as a Statrt 
-    ENDP
-
-
-START_MOTION_STATE PROC
-     push {r0}                  ; Save target floor safely to the stack
-     bl Stepper_Enable 
-     ;lock current door , update oled , wait 2 seconds 
-
-     mov r0, #STATE_MOVING
-     bl UI_SetSystemState
-     bl UI_Update
-
-     ldr r0,=2000
-     bl SysTick_delay_ms ;Wait 2 seconds for clearance before moving
-     pop {r0}                   ; Restore target floor
-     b MOVING_STATE
-    ENDP
-
-
-
-;;Takes destination from caller in r0 
-MOVING_STATE PROC
-    mov r5, r0 
-    mov r9, #0                  ; r9 = Integral Accumulator (Initialize to 0)
-   ; mov r11, #0                 ; r11 = Missed Frame Counter (Initialize to 0)
-    mov r12, #0                 ; r12 = Current Speed (Initialize to 0)
-loop_moving
-    push {r5, r9, r11, r12}     ; Defensively save state registers
-    bl TOF_Read_Distance         ; Read distance from TOF400F sensor
-    pop {r5, r9, r11, r12}      ; Restore registers
-    
-    ; --- Handle Sensor Timeout/Error ---
-    ldr r1, =0xFFFFFFFF
-    cmp r0, r1
-    bne valid_reading           ; If valid, continue processing
-    
-    b loop_moving               ; Always ignore error and coast at current speed
-
-valid_reading
-    mov r11, #0                 ; Reset frame error counter on valid read
-    mov r4, r0                  ; Move distance reading to r4 for processing
-    ;;;check deaad band for 10mm to avoid noise
-    ;;; error in r6 
-    subs r6, r5, r4       ; r6 = sp - distance
-    
-    ; --- Get Absolute Error for Deadband Check ---
-    cmp r6, #0
-    ite lt
-    rsblt r7, r6, #0            ; If r6 < 0, r7 = -r6
-    movge r7, r6                ; If r6 >= 0, r7 = r6
-    
-    cmp r7, #10                 ; Check absolute error against deadband
-    blo within_deadband
-    
-    ; --- Update Integral Accumulator with Anti-Windup ---
-    add r9, r9, r6              ; Accumulator += Error
-    ldr r10, =500              ; Positive clamp limit 
-    cmp r9, r10
-    it gt
-    movgt r9, r10
-    ldr r10, =-500             ; Negative clamp limit (reduced to prevent windup)
-    cmp r9, r10                ; FIX: Compare accumulator against negative limit
-    it lt
-    movlt r9, r10
-    
-    ; --- Calculate Signed PI Output ---
-    ldr r10, =CL_KP
-    mul r7, r6, r10             ; P_term = Error * KP
-    ldr r10, =CL_KI
-    sdiv r8, r9, r10             ; I_term = Accumulator / KI
-    add r7, r7, r8              ; PI_Output = P_term + I_term
-    
-    ; --- Determine Direction and Absolute Speed ---
-    cmp r7, #0
-    ite ge
-    movge r0, #1               ; Direction 0 (Positive)
-    movlt r0, #0               ; Direction 1 (Negative)
-    it lt
-    rsblt r7, r7, #0            ; Absolute speed = |PI_Output|
-    cmp r7, #16                 ; Minimum safe speed for 16-bit timer at 1MHz
-    it lt
-    movlt r7, #16 
-    ldr r10, =7000             ; Max safe speed to prevent stepper motor stall
-    cmp r7, r10
-    it gt
-    movgt r7, r10
-    
-    ; --- Soft Starter (Acceleration Ramp) ---
-    cmp r7, r12                 ; Compare desired speed (r7) with current speed (r12)
-    ble apply_speed             ; If decelerating or steady, let PI handle it directly
-    
-    subs r10, r7, r12           ; Calculate speed difference (acceleration)
-    cmp r10, #95              ; Compare with max acceleration step (150 Hz/loop)
-    ble apply_speed             ; If within limits, apply desired speed
-    
-    add r7, r12, #95           ; Otherwise, cap the speed to current + 150
-    
-apply_speed
-    mov r12, r7                 ; Store new speed as current speed for next loop iteration
-    
-    push {r5, r7, r9, r11, r12} ; Protect registers across function calls
-    bl Stepper_SetDirection     ; Set direction (r0)
-    pop {r5, r7, r9, r11, r12}
-    push {r5, r7, r9, r11, r12}
-    mov r0, r7                  ; Load absolute speed (r7)
-    bl Stepper_SetSpeed         ; Set speed (r0)
-    pop {r5, r7, r9, r11, r12}  ; Restore registers
-
-    b loop_moving
-within_deadband
-    mov r0, #0
-    bl Stepper_SetSpeed        ; Adjust stepper speed based on distance error (you can implement a control algorithm here using CL_KP and CL_KI)
-    ldr r3, =CurrentFloor       ; Get address of CurrentFloor variable
-    str r5, [r3]                ; Save the new floor state to memory
-    b STOP_MOTION_STATE
-
-    ENDP
-
-
-STOP_MOTION_STATE PROC
-    mov r0, #0                  ; Set speed to 0 to stop the motor
-    bl Stepper_SetSpeed        ; Set stepper speed to 0 to stop it
-
-    ldr r1, =UI_TargetFloor
-    ldrb r0, [r1]
-    ldr r1, =UI_CurrentFloor
-    strb r0, [r1]
-
-    ;unlock door , update oled 
-    b IDLE_STATE
-    ENDP
-
-
-
-IDLE_STATE PROC
-    mov r0, #STATE_IDLE
-    bl UI_SetSystemState
-    bl UI_Update
-idle_loop
-    bl Decode_Keypad            ; Check if any key is pressed and decode it
-    cmp r0, #0                  ; If r0 = 0, no key is pressed
-    
-    push {r0}                  ; Save decoded key safely to the stack
-    mov r0, #15
-    bl SysTick_delay_ms         ; Short delay to debounce keypad input
-    pop {r0}                   ; Restore decoded key after delay
-    beq idle_loop
-    ; --- Handle Key Presses ---
-    cmp r0, #'0'                ; Check if key '0' is pressed
-    beq go_floor0
-    cmp r0, #'1'                ; Check if key '1' is pressed
-    beq go_floor1
-    cmp r0, #'2'                ; Check if key '2' is pressed
-    beq go_floor2
-    
-
-    bl Read_Button_Values         
-    cmp r0, #0               ; Check if key '0' is pressed
-    beq go_floor0
-    cmp r0, #1            ; Check if key '1' is pressed
-    beq go_floor1
-    cmp r0, #2               ; Check if key '2' is pressed
-    beq go_floor2
-
-    bl UI_Update
-
-    b idle_loop                 ; If any other key is pressed, ignore it
-
-go_floor0
-    mov r0, #1                  ; TRACK_GROUND
-    bl DFP_PlayImmediate
-    mov r0, #0
-    bl LED_ON_FLOOR
-    mov r0, #0
-    bl UI_SetTargetFloor
-    ldr r0, =FLOOR0_SP
-    b START_MOTION_STATE
-go_floor1
-    mov r0, #2                  ; TRACK_FIRST
-    bl DFP_PlayImmediate
-    mov r0, #1
-    bl LED_ON_FLOOR
-    mov r0, #1
-    bl UI_SetTargetFloor
-    ldr r0, =FLOOR1_SP
-    b START_MOTION_STATE
-go_floor2
-    mov r0, #3                  ; TRACK_SECOND
-    bl DFP_PlayImmediate
-    mov r0, #2
-    bl LED_ON_FLOOR
-    mov r0, #2
-    bl UI_SetTargetFloor
-    ldr r0, =FLOOR2_SP
-    b START_MOTION_STATE
-    ENDP
-
-    ALIGN
-    END
+	ENDP
+    ALIGN 
+    end

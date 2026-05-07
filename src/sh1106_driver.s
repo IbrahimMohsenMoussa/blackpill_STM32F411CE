@@ -10,6 +10,7 @@
 OLED_Buffer SPACE 1024          ; 1024-byte SRAM Shadow Buffer
 Cursor_X    SPACE 1             ; Global Cursor X (0-127)
 Cursor_Y    SPACE 1             ; Global Cursor Y/Page (0-7)
+Current_OLED_Page SPACE 1       ; Tracks current page for chunked updates
 
 ; ====================================================================
 
@@ -20,6 +21,7 @@ Cursor_Y    SPACE 1             ; Global Cursor Y/Page (0-7)
     EXPORT OLED_Init
     EXPORT OLED_ClearBuffer
     EXPORT OLED_UpdateScreen
+    EXPORT OLED_Update_Chunked
     EXPORT OLED_SetCursor
     EXPORT OLED_PutChar
     EXPORT OLED_PrintStr
@@ -153,6 +155,75 @@ update_col_loop
     pop     {r4-r11, pc}
 
 update_error
+    bl      I2C1_Stop
+    pop     {r4-r11, pc}
+    ENDP
+
+; --------------------------------------------------------------------
+; UI_Update_Chunked
+; Updates a single page (128 bytes) of the OLED buffer to prevent
+; blocking the RTOS for too long. Call this repeatedly from main_loop.
+; --------------------------------------------------------------------
+OLED_Update_Chunked PROC
+    push    {r4-r11, lr}
+
+    ldr     r5, =Current_OLED_Page
+    ldrb    r4, [r5]            ; r4 = Current_OLED_Page (0-7)
+
+    ; Set Page Address (0xB0 + Page)
+    orr     r0, r4, #0xB0
+    bl      SH1106_WriteCmd
+
+    ; Set Lower Column Address to 2 (0x02) - Mandatory for SH1106 offset
+    mov     r0, #0x02
+    bl      SH1106_WriteCmd
+
+    ; Set Upper Column Address to 0 (0x10)
+    mov     r0, #0x10
+    bl      SH1106_WriteCmd
+
+    ; Start I2C Data Stream
+    mov     r0, #0x78           ; I2C Address + Write
+    bl      I2C1_Start
+    cmp     r0, #1
+    beq     chunked_error
+
+    mov     r0, #0x40           ; Co=0, D/C#=1 (Data stream)
+    bl      I2C1_Write
+    cmp     r0, #1
+    beq     chunked_error
+
+    ; Calculate Buffer Offset: OLED_Buffer + (Current_OLED_Page * 128)
+    ldr     r5, =OLED_Buffer
+    mov     r6, #128
+    mul     r7, r4, r6
+    add     r5, r5, r7          ; r5 = pointer to the start of the page data
+
+    mov     r6, #128            ; 128 columns per page
+chunked_col_loop
+    ldrb    r0, [r5], #1        ; Read from SRAM buffer
+    bl      I2C1_Write
+    cmp     r0, #1
+    beq     chunked_error
+
+    subs    r6, r6, #1
+    bne     chunked_col_loop
+
+    bl      I2C1_Stop
+
+    ; Increment and Wrap Current_OLED_Page
+    add     r4, r4, #1
+    cmp     r4, #8
+    blt     chunked_store
+    mov     r4, #0
+
+chunked_store
+    ldr     r5, =Current_OLED_Page
+    strb    r4, [r5]
+
+    pop     {r4-r11, pc}
+
+chunked_error
     bl      I2C1_Stop
     pop     {r4-r11, pc}
     ENDP

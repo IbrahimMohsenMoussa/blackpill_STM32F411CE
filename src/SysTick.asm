@@ -53,8 +53,8 @@ SysTick_Init PROC
     STR     R1, [R2]                ; Zero out Global_Tick_ms
     
     LDR     R2, =RTOS_Display_Counter
-    MOV     R1, #200
-    STR     R1, [R2]                ; Initialize display countdown to 200ms
+    MOV     R1, #50                   ; Start with 50ms to allow initial system stabilization
+    STR     R1, [R2]                ; Initialize display countdown to 50ms
     
     ; 4. Write to CTRL: Enable Timer (Bit 0), Enable Interrupt (Bit 1), AHB/8 (Bit 2 = 0)
     MOV     R1, #3                  
@@ -85,8 +85,8 @@ SysTick_Handler PROC
     ; Check if display counter hit 0 (Z-flag set by SUBS)
     BNE     SysTick_Handler_Done    
     
-    ; 3. Reload display counter with 200ms
-    MOV     R1, #200
+    ; 3. Reload display counter with 50ms
+    MOV     R1, #50
     STR     R1, [R0]
     
     ; 4. Flag the main loop that the display needs to be updated

@@ -80,6 +80,11 @@ PinConfigTable
     ; Hex: 0x0 D 1 1 0 0 0 0
     DCD     0x0D110000
 
+    ; PB8 - Pin=8, Port=1(B), Mode=0(In), OT=0, Spd=0, PUPD=0, AF=0 supply on divider 
+    ; Hex: 0x0 8 1 0 0 0 0 0
+    DCD     0x08100000
+
+
    
 
     ; End of Table Terminator (Sentinel)
