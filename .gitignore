@@ -22,10 +22,6 @@ tmp/1/.ninja_deps
 tmp/1/.ninja_log
 tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-database-out.log
 
-# Ignore the entire build directory
-build/*
-!build/.gitkeep
-
 # Ignore personal GUI settings
 *.uvguix.*
 *.uvoptx.*
