@@ -67,5 +67,9 @@ project:
         - file: src/font.inc
         - file: src/sh1106_driver.s
         - file: src/bitmaps.asm
-        - file: src/main.asm
         - file: src/ui_driver.s
+        - file: src/main.asm
+        - file: src/DFPlayer_defs.s
+        - file: src/DFPlayer.s
+        - file: src/UART1.s
+        - file: src/UART1_defs.s

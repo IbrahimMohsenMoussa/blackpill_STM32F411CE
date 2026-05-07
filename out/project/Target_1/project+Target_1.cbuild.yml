@@ -196,9 +196,17 @@ build:
           category: sourceAsm
         - file: ../../../src/bitmaps.asm
           category: sourceAsm
+        - file: ../../../src/ui_driver.s
+          category: sourceAsm
         - file: ../../../src/main.asm
           category: sourceAsm
-        - file: ../../../src/ui_driver.s
+        - file: ../../../src/DFPlayer_defs.s
+          category: sourceAsm
+        - file: ../../../src/DFPlayer.s
+          category: sourceAsm
+        - file: ../../../src/UART1.s
+          category: sourceAsm
+        - file: ../../../src/UART1_defs.s
           category: sourceAsm
   constructed-files:
     - file: ../../../RTE/_Target_1/RTE_Components.h

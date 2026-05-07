@@ -47,6 +47,8 @@ str_target      DCB "TARGET: ", 0
     EXPORT UI_SetTargetFloor
     EXPORT UI_SetSystemState
     EXPORT UI_Update
+    EXPORT UI_TargetFloor
+    EXPORT UI_CurrentFloor
 
 ; --------------------------------------------------------------------
 ; UI_Init

@@ -15,8 +15,12 @@ add_library(Group_src OBJECT
   "${SOLUTION_ROOT}/src/rtc_driver.asm"
   "${SOLUTION_ROOT}/src/sh1106_driver.s"
   "${SOLUTION_ROOT}/src/bitmaps.asm"
-  "${SOLUTION_ROOT}/src/main.asm"
   "${SOLUTION_ROOT}/src/ui_driver.s"
+  "${SOLUTION_ROOT}/src/main.asm"
+  "${SOLUTION_ROOT}/src/DFPlayer_defs.s"
+  "${SOLUTION_ROOT}/src/DFPlayer.s"
+  "${SOLUTION_ROOT}/src/UART1.s"
+  "${SOLUTION_ROOT}/src/UART1_defs.s"
 )
 target_include_directories(Group_src PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
@@ -143,6 +147,14 @@ set(COMPILE_DEFINITIONS
   _RTE_
 )
 cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
+set_source_files_properties("${SOLUTION_ROOT}/src/ui_driver.s" PROPERTIES
+  COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
+)
+set(COMPILE_DEFINITIONS
+  STM32F411xE
+  _RTE_
+)
+cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
 set_source_files_properties("${SOLUTION_ROOT}/src/main.asm" PROPERTIES
   COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
 )
@@ -151,6 +163,30 @@ set(COMPILE_DEFINITIONS
   _RTE_
 )
 cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
-set_source_files_properties("${SOLUTION_ROOT}/src/ui_driver.s" PROPERTIES
+set_source_files_properties("${SOLUTION_ROOT}/src/DFPlayer_defs.s" PROPERTIES
+  COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
+)
+set(COMPILE_DEFINITIONS
+  STM32F411xE
+  _RTE_
+)
+cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
+set_source_files_properties("${SOLUTION_ROOT}/src/DFPlayer.s" PROPERTIES
+  COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
+)
+set(COMPILE_DEFINITIONS
+  STM32F411xE
+  _RTE_
+)
+cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
+set_source_files_properties("${SOLUTION_ROOT}/src/UART1.s" PROPERTIES
+  COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
+)
+set(COMPILE_DEFINITIONS
+  STM32F411xE
+  _RTE_
+)
+cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
+set_source_files_properties("${SOLUTION_ROOT}/src/UART1_defs.s" PROPERTIES
   COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
 )

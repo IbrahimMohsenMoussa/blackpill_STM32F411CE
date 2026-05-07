@@ -1,7 +1,7 @@
 ; Assembly program for STM32F411 (Black Pill) to blink the onboard LED (PC13)
 
 
-FLOOR0_SP EQU 100
+FLOOR0_SP EQU 52
 FLOOR1_SP EQU 360
 FLOOR2_SP EQU 650
 ; ====================================================================
@@ -20,7 +20,7 @@ UI_FLOOR_1      EQU     1       ; First Floor (UI Graphic mapping)
 UI_FLOOR_2      EQU     2       ; Second Floor (UI Graphic mapping)
 
 CL_KI EQU 2 ; Closed Loop KI value for speed control (tune as needed)
-CL_KP EQU 35; Closed Loop KP value for speed control (tune as needed)
+CL_KP EQU 25; Closed Loop KP value for speed control (tune as needed)
     AREA |.data|, DATA, READWRITE
 CurrentFloor DCD FLOOR0_SP
 
@@ -66,6 +66,10 @@ CurrentFloor DCD FLOOR0_SP
     IMPORT UI_SetTargetFloor
     IMPORT UI_SetSystemState
     IMPORT UI_Update
+    IMPORT UI_TargetFloor
+    IMPORT UI_CurrentFloor
+    IMPORT DFP_Init
+    IMPORT DFP_PlayImmediate
 
 
 delay_loop PROC
@@ -109,89 +113,57 @@ ENDP
 
 
 main PROC
-    b WAKEUP_STATE
-               ; Initialize GPIO pins for LED and other peripherals
+    ldr r2,=10000000
+    bl delay_loop                 ; Short delay to ensure stable power before initialization
     bl PLLInit                   ; initialize PLL to restore system clock
     bl GPIO_Init_All             ; initialize GPIO pins
-    bl Stepper_Init              ; initialize Timer 3 for stepper control
-    bl Stepper_Enable            ; enable TMC2209 stepper driver Lock the stepper shaft 
-    bl TOF_Init                  ; initialize TOF400F module
+    
+   ; bl TOF_Init                  ; initialize TOF400F module
     bl SysTick_Init              ; initialize SysTick timer
-    bl Keys_init                 ; initialize ADC for keypad and Floor calling buttons 
-    bl I2C1_Init                   ; initialize I2C1 for OLED communication
-    bl RTC_Init                   ; initialize RTC for timekeeping (if needed for future features)
+   ; bl Keys_init                 ; initialize ADC for keypad and Floor calling buttons 
+   ; bl I2C1_Init                 ; initialize I2C1 for OLED communication
+  ;  bl RTC_Init                  ; initialize RTC for timekeeping (if needed for future features)\   ldr r2,=10000000
+                 ; Short delay to ensure all peripherals are stable before OLED initialization
 
-    ldr r2,=10000000
-    bl delay_loop                 ; Short delay to ensure all peripherals are stable before OLED initialization
-
-    bl OLED_Init                  ; initialize SH1106 OLED display
-    bl UI_Init                     ; initialize UI elements on OLED
-    bl UI_Update                   ; update OLED with initial UI state
+   ; bl OLED_Init                  ; initialize SH1106 OLED display
+   ; bl UI_Init                     ; initialize UI elements on OLED
+   ; bl Stepper_Init              ; initialize Timer 3 for stepper control
+    ;bl Stepper_Enable            ; enable TMC2209 stepper driver Lock the stepper shaft 
+    bl DFP_Init                  ; initialize DFPlayer Mini for audio feedback
+   ; b WAKEUP_STATE
 loop
-    ; Test Loop for UI Driver
-    ; Cycle through states and floors to verify display logic
+
+    ; Loop that plays tracks 1 to 5 with 3-second delays
+    mov     r4, #1               ; Start with Track 1
+track_loop
+    mov     r0, r4
+    bl      DFP_PlayImmediate    ; Play current track
     
-    ; State 0: IDLE, Floor 0
-    mov     r0, #0
-    bl      UI_SetSystemState
-    mov     r0, #0
-    bl      UI_SetCurrentFloor
-    bl      UI_Update
-    ldr     r2, =20000000
-    bl      delay_loop
-
-    ; State 1: AUTH, Floor 0
-    mov     r0, #1
-    bl      UI_SetSystemState
-    bl      UI_Update
-    ldr     r2, =20000000
-    bl      delay_loop
-
-    ; State 2: MOVING, Target Floor 2, Current Floor 0 (Up Arrow)
-    mov     r0, #2
-    bl      UI_SetSystemState
-    mov     r0, #2
-    bl      UI_SetTargetFloor
-    bl      UI_Update
-    ldr     r2, =20000000
-    bl      delay_loop
-
-    ; Update Current Floor to 1 while moving
-    mov     r0, #1
-    bl      UI_SetCurrentFloor
-    bl      UI_Update
-    ldr     r2, =20000000
-    bl      delay_loop
-
-    ; Arrived at Floor 2, Back to IDLE
-    mov     r0, #2
-    bl      UI_SetCurrentFloor
-    mov     r0, #0
-    bl      UI_SetSystemState
-    bl      UI_Update
-    ldr     r2, =20000000
-    bl      delay_loop
-
+    ldr     r0, =3000            ; 3000ms delay
+    bl      SysTick_delay_ms
     
-	b loop 
+    add     r4, r4, #1           ; Increment track number
+    cmp     r4, #6               ; Check if we finished track 5
+    blt     track_loop           ; If r4 < 6, continue loop
+    
+    b       loop                 ; Repeat the entire sequence
+   ; Plays track 1, waits 3 seconds, plays track 2, waits 3 seconds, loops.
+    mov r0, #1                   ; TRACK_GROUND
+    bl DFP_PlayImmediate
+    ldr r0, =10000
+    bl SysTick_delay_ms
+    
+    mov r0, #2                   ; TRACK_FIRST
+    bl DFP_PlayImmediate
+    ldr r0, =10000
+    bl SysTick_delay_ms
+    b loop
     ENDP
 
 
 
 
 WAKEUP_STATE PROC
-    ; This function is called on wakeup from sleep mode.
-    ; It should reinitialize any peripherals that were turned off before sleeping.
-
-    bl PLLInit                   ; initialize PLL to restore system clock
-    
-    bl GPIO_Init_All             ; initialize GPIO pins
-    bl Stepper_Init              ; initialize Timer 3 for stepper control
-    bl Stepper_Enable            ; enable TMC2209 stepper driver Lock the stepper shaft 
-   
-    bl TOF_Init                  ; initialize TOF400F module
-    bl SysTick_Init              ; initialize SysTick timer
-    bl Keys_init                 ; initialize ADC for keypad and Floor calling buttons 
    
 
     ldr r0, =FLOOR1_SP
@@ -203,6 +175,10 @@ START_MOTION_STATE PROC
      push {r0}                  ; Save target floor safely to the stack
      bl Stepper_Enable 
      ;lock current door , update oled , wait 2 seconds 
+
+     mov r0, #STATE_MOVING
+     bl UI_SetSystemState
+     bl UI_Update
 
      ldr r0,=2000
      bl SysTick_delay_ms ;Wait 2 seconds for clearance before moving
@@ -274,7 +250,7 @@ valid_reading
     cmp r7, #16                 ; Minimum safe speed for 16-bit timer at 1MHz
     it lt
     movlt r7, #16 
-    ldr r10, =8000             ; Max safe speed to prevent stepper motor stall
+    ldr r10, =7000             ; Max safe speed to prevent stepper motor stall
     cmp r7, r10
     it gt
     movgt r7, r10
@@ -284,10 +260,10 @@ valid_reading
     ble apply_speed             ; If decelerating or steady, let PI handle it directly
     
     subs r10, r7, r12           ; Calculate speed difference (acceleration)
-    cmp r10, #150               ; Compare with max acceleration step (150 Hz/loop)
+    cmp r10, #95              ; Compare with max acceleration step (150 Hz/loop)
     ble apply_speed             ; If within limits, apply desired speed
     
-    add r7, r12, #150           ; Otherwise, cap the speed to current + 150
+    add r7, r12, #95           ; Otherwise, cap the speed to current + 150
     
 apply_speed
     mov r12, r7                 ; Store new speed as current speed for next loop iteration
@@ -314,6 +290,12 @@ within_deadband
 STOP_MOTION_STATE PROC
     mov r0, #0                  ; Set speed to 0 to stop the motor
     bl Stepper_SetSpeed        ; Set stepper speed to 0 to stop it
+
+    ldr r1, =UI_TargetFloor
+    ldrb r0, [r1]
+    ldr r1, =UI_CurrentFloor
+    strb r0, [r1]
+
     ;unlock door , update oled 
     b IDLE_STATE
     ENDP
@@ -321,6 +303,9 @@ STOP_MOTION_STATE PROC
 
 
 IDLE_STATE PROC
+    mov r0, #STATE_IDLE
+    bl UI_SetSystemState
+    bl UI_Update
 idle_loop
     bl Decode_Keypad            ; Check if any key is pressed and decode it
     cmp r0, #0                  ; If r0 = 0, no key is pressed
@@ -347,23 +332,35 @@ idle_loop
     cmp r0, #2               ; Check if key '2' is pressed
     beq go_floor2
 
-
+    bl UI_Update
 
     b idle_loop                 ; If any other key is pressed, ignore it
 
 go_floor0
+    mov r0, #1                  ; TRACK_GROUND
+    bl DFP_PlayImmediate
     mov r0, #0
     bl LED_ON_FLOOR
+    mov r0, #0
+    bl UI_SetTargetFloor
     ldr r0, =FLOOR0_SP
     b START_MOTION_STATE
 go_floor1
+    mov r0, #2                  ; TRACK_FIRST
+    bl DFP_PlayImmediate
     mov r0, #1
     bl LED_ON_FLOOR
+    mov r0, #1
+    bl UI_SetTargetFloor
     ldr r0, =FLOOR1_SP
     b START_MOTION_STATE
 go_floor2
+    mov r0, #3                  ; TRACK_SECOND
+    bl DFP_PlayImmediate
     mov r0, #2
     bl LED_ON_FLOOR
+    mov r0, #2
+    bl UI_SetTargetFloor
     ldr r0, =FLOOR2_SP
     b START_MOTION_STATE
     ENDP

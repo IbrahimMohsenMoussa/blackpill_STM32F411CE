@@ -63,6 +63,9 @@ PinConfigTable
     ; PA12 - Pin=C(12), Port=0(A), Mode=2(AF), OT=0, Spd=3(High), PUPD=0, AF=8 (USART6_RX)
     ; Hex: 0x0 C 0 2 0 3 0 8
     DCD     0x0C020308
+    
+    ; PA9 - Pin=9, Port=0(A), Mode=2(AF), OT=0(PP), Spd=3(High), PUPD=0(None), AF=7 (USART1_TX)
+    DCD     0x09020307
 
 
     DCD     0x0F010000
