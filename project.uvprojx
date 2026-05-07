@@ -419,6 +419,91 @@
               <FileType>2</FileType>
               <FilePath>.\src\SysTick.asm</FilePath>
             </File>
+            <File>
+              <FileName>adc.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\adc.asm</FilePath>
+            </File>
+            <File>
+              <FileName>bitmaps.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\bitmaps.asm</FilePath>
+            </File>
+            <File>
+              <FileName>brakes.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\brakes.asm</FilePath>
+            </File>
+            <File>
+              <FileName>DFPlayer.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\DFPlayer.s</FilePath>
+            </File>
+            <File>
+              <FileName>DFPlayer_defs.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\DFPlayer_defs.s</FilePath>
+            </File>
+            <File>
+              <FileName>exti.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\exti.asm</FilePath>
+            </File>
+            <File>
+              <FileName>font.inc</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\font.inc</FilePath>
+            </File>
+            <File>
+              <FileName>i2c.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\i2c.asm</FilePath>
+            </File>
+            <File>
+              <FileName>keypad.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\keypad.asm</FilePath>
+            </File>
+            <File>
+              <FileName>rtc_driver.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\rtc_driver.asm</FilePath>
+            </File>
+            <File>
+              <FileName>sh1106_driver.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\sh1106_driver.s</FilePath>
+            </File>
+            <File>
+              <FileName>stepper.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\stepper.asm</FilePath>
+            </File>
+            <File>
+              <FileName>timer.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\timer.asm</FilePath>
+            </File>
+            <File>
+              <FileName>tof400f_driver.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\tof400f_driver.s</FilePath>
+            </File>
+            <File>
+              <FileName>UART1.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\UART1.s</FilePath>
+            </File>
+            <File>
+              <FileName>UART1_defs.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\UART1_defs.s</FilePath>
+            </File>
+            <File>
+              <FileName>ui_driver.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\ui_driver.s</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -466,5 +551,14 @@
       </file>
     </files>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>project</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>
