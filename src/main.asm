@@ -109,9 +109,7 @@ LED_ON_FLOOR PROC
     bl DIO_WriteLogical
 
     pop {r4, pc}
-
-
-ENDP
+	ENDP
 
 
 main PROC
@@ -134,7 +132,6 @@ main PROC
     bl DFP_Init                  ; initialize DFPlayer Mini for audio feedback
    ; b WAKEUP_STATE
 loop
-
     ; Loop that plays tracks 1 to 5 with 3-second delays
     mov     r4, #1               ; Start with Track 1
 track_loop
@@ -162,43 +159,38 @@ track_loop
     b loop
     ENDP
 
-
-
-
 WAKEUP_STATE PROC
-   
-
     ldr r0, =FLOOR1_SP
     b START_MOTION_STATE ; hand off to motion states to move to floor 1 as a Statrt 
-    ENDP
+	ENDP
 
 
 START_MOTION_STATE PROC
-     push {r0}                  ; Save target floor safely to the stack
-     bl Stepper_Enable 
-     ;lock current door , update oled , wait 2 seconds 
+	push {r0}                  ; Save target floor safely to the stack
+	bl Stepper_Enable 
+	;lock current door , update oled , wait 2 seconds 
 
-     mov r0, #STATE_MOVING
-     bl UI_SetSystemState
-     bl UI_Update
+	mov r0, #STATE_MOVING
+	bl UI_SetSystemState
+	bl UI_Update
 
-     ldr r0,=2000
-     bl SysTick_delay_ms ;Wait 2 seconds for clearance before moving
-     pop {r0}                   ; Restore target floor
-     b MOVING_STATE
-    ENDP
+	ldr r0,=2000
+	bl SysTick_delay_ms ;Wait 2 seconds for clearance before moving
+	pop {r0}                   ; Restore target floor
+	b MOVING_STATE
+	ENDP
 
 
 
 ;;Takes destination from caller in r0 
 MOVING_STATE PROC
-    mov r5, r0 
+	mov r5, r0 
     mov r9, #0                  ; r9 = Integral Accumulator (Initialize to 0)
-   ; mov r11, #0                 ; r11 = Missed Frame Counter (Initialize to 0)
-    mov r12, #0                 ; r12 = Current Speed (Initialize to 0)
+	;mov r11, #0                 ; r11 = Missed Frame Counter (Initialize to 0)
+	mov r12, #0                 ; r12 = Current Speed (Initialize to 0)
 loop_moving
-    push {r5, r9, r11, r12}     ; Defensively save state registers
-    bl TOF_Read_Distance         ; Read distance from TOF400F sensor
+	push {r5, r9, r11, r12}     ; Defensively save state registers
+	bl TOF_Read_Distance         ; Read distance from TOF400F sensor
     pop {r5, r9, r11, r12}      ; Restore registers
     
     ; --- Handle Sensor Timeout/Error ---

@@ -183,4 +183,5 @@ DIO_ReadPort PROC
     bx lr                       ; Return from function
     ENDP
 
+	ALIGN    ; This fixes A1581W
     END

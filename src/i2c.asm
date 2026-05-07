@@ -31,6 +31,7 @@ I2C_CR1_ACK     EQU (1 :SHL: 10)    ; Acknowledge Enable
 I2C_SR1_SB      EQU (1 :SHL: 0)     ; Start Bit generated
 I2C_SR1_ADDR    EQU (1 :SHL: 1)     ; Address sent
 I2C_SR1_BTF     EQU (1 :SHL: 2)     ; Byte Transfer Finished
+I2C_SR1_RXNE	EQU (1 :SHL: 6)		; Added: Receive Data Register Not Empty
 I2C_SR1_TXE     EQU (1 :SHL: 7)     ; Data Register Empty
 I2C_SR1_AF      EQU (1 :SHL: 10)    ; Acknowledge Failure
 
@@ -59,6 +60,10 @@ I2C_TRISE_VAL   EQU ((I2C_FREQ_MHZ * 300) / 1000) + 1
     EXPORT I2C1_Start
     EXPORT I2C1_Write
     EXPORT I2C1_Stop
+	EXPORT I2C1_StopTx
+	EXPORT I2C1_StopRx
+    EXPORT I2C1_ReadAck
+    EXPORT I2C1_ReadNack
     IMPORT RCC_APB1_Enable
 
 ; ----------------------------------------------------------------------------
@@ -94,9 +99,11 @@ I2C1_Init PROC
     ldr     r1, =I2C_TRISE_VAL
     str     r1, [r4, #I2C_TRISE]
     
-    ; 7. Enable I2C peripheral
-    ldr     r1, =I2C_CR1_PE
-    str     r1, [r4, #I2C_CR1]
+    ; 7. Enable I2C peripheral (Seif : with ACK)
+	LDR     r1, [r4, #I2C_CR1]
+	ORR 	r1, r1, #I2C_CR1_PE
+	ORR 	r1, r1, #I2C_CR1_ACK
+	STR     r1, [r4, #I2C_CR1]
     
     pop     {r4, pc}
     ENDP
@@ -170,7 +177,7 @@ wait_txe
     beq     wait_txe
     
     ; 2. Write the data byte
-    str     r0, [r4, #I2C_DR]
+    strb     r0, [r4, #I2C_DR]
     
     mov     r0, #0               ; Return 0 (Success)
     pop     {r4, pc}
@@ -183,6 +190,58 @@ i2c_write_nack
     orr     r1, r1, #I2C_CR1_STOP
     str     r1, [r4, #I2C_CR1]
     mov     r0, #1               ; Return 1 (Error)
+    pop     {r4, pc}
+    ENDP
+		
+; ----------------------------------------------------------------------------
+; I2C2_ReadAck
+; Reads a byte and automatically sends an ACK to continue receiving.
+; Output: R0 = Received Byte
+; ----------------------------------------------------------------------------
+I2C1_ReadAck PROC
+    push    {r4, lr}
+    ldr     r4, =I2C1_BASE
+
+    ; 1. Enable Acknowledge (ACK = 1)
+    ldr     r1, [r4, #I2C_CR1]
+    orr     r1, r1, #I2C_CR1_ACK
+    str     r1, [r4, #I2C_CR1]
+
+wait_rxne_ack
+    ; 2. Wait until Receive Data Register is not empty (RXNE)
+    ldr     r1, [r4, #I2C_SR1]
+    tst     r1, #I2C_SR1_RXNE
+    beq     wait_rxne_ack
+
+    ; 3. Read data from DR
+    ldrb     r0, [r4, #I2C_DR]
+
+    pop     {r4, pc}
+    ENDP
+
+; ----------------------------------------------------------------------------
+; I2C1_ReadNack
+; Reads the last byte and sends a NACK to signal end of reception.
+; Output: R0 = Received Byte
+; ----------------------------------------------------------------------------
+I2C1_ReadNack PROC
+    push    {r4, lr}
+    ldr     r4, =I2C1_BASE
+
+    ; 1. Disable Acknowledge (ACK = 0) to send NACK after next byte
+    ldr     r1, [r4, #I2C_CR1]
+    bic     r1, r1, #I2C_CR1_ACK
+    str     r1, [r4, #I2C_CR1]
+
+wait_rxne_nack
+    ; 2. Wait until Receive Data Register is not empty (RXNE)
+    ldr     r1, [r4, #I2C_SR1]
+    tst     r1, #I2C_SR1_RXNE
+    beq     wait_rxne_nack
+
+    ; 3. Read data from DR
+    ldrb     r0, [r4, #I2C_DR]
+
     pop     {r4, pc}
     ENDP
 
@@ -221,5 +280,101 @@ i2c_stop_force
     mov     r0, #1               ; Return 1 (Error)
     pop     {r4, pc}
     ENDP
+		
+; ----------------------------------------------------------------------------
+; I2C1_StopTx
+;
+; Generates STOP condition after TRANSMIT operations.
+; Intended for:
+;   - OLED writes
+;   - MPU register writes
+;   - Any TX transaction
+;
+; Waits for BTF before STOP generation.
+;
+; Return:
+;   R0 = 0 success
+;   R0 = 1 error (NACK detected)
+; ----------------------------------------------------------------------------
+I2C1_StopTx PROC
+	push    {r4, lr}
+	ldr     r4, =I2C1_BASE
 
+wait_btf_tx
+	; Read SR1
+	ldr     r1, [r4, #I2C_SR1]
+
+	; If NACK occurred, abort gracefully
+	tst     r1, #I2C_SR1_AF
+	bne     i2c_stop_tx_force
+
+	; Wait until byte transfer finished
+	tst     r1, #I2C_SR1_BTF
+	beq     wait_btf_tx
+
+	; Generate STOP
+	ldr     r1, [r4, #I2C_CR1]
+	orr     r1, r1, #I2C_CR1_STOP
+	str     r1, [r4, #I2C_CR1]
+
+	mov     r0, #0
+
+	pop     {r4, pc}
+
+; Error path
+i2c_stop_tx_force
+    ; Clear AF flag
+	bic     r1, r1, #I2C_SR1_AF
+	str     r1, [r4, #I2C_SR1]
+
+	; Force STOP
+	ldr     r1, [r4, #I2C_CR1]
+	orr     r1, r1, #I2C_CR1_STOP
+	str     r1, [r4, #I2C_CR1]
+	mov     r0, #1
+
+	pop     {r4, pc}
+	ENDP
+
+
+; ----------------------------------------------------------------------------
+; I2C1_StopRx
+;
+; Generates STOP condition after RECEIVE operations.
+; Intended for:
+;   - MPU6050 burst reads
+;
+; IMPORTANT:
+;   Does NOT wait for BTF.
+;
+; Reason:
+;   In RX mode after final NACK,
+;   BTF may never become set.
+;
+; Also restores ACK for future transactions.
+;
+; Return:
+;   R0 = 0 (no use for it but maintains same approach as I2C1_StopTx)
+; ----------------------------------------------------------------------------
+I2C1_StopRx PROC
+    push    {r4, lr}
+
+    ldr     r4, =I2C1_BASE
+
+    ; Generate STOP immediately
+    ldr     r1, [r4, #I2C_CR1]
+    orr     r1, r1, #I2C_CR1_STOP
+    str     r1, [r4, #I2C_CR1]
+
+    ; Restore ACK for future reads
+    ldr     r1, [r4, #I2C_CR1]
+    orr     r1, r1, #I2C_CR1_ACK
+    str     r1, [r4, #I2C_CR1]
+
+    mov     r0, #0
+
+    pop     {r4, pc}
+	ENDP
+
+	ALIGN
     END

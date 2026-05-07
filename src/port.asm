@@ -252,4 +252,6 @@ end_pin_init
     pop     {r4-r8, pc}
     ENDP
 
+
+	ALIGN
     END

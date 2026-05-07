@@ -12,12 +12,31 @@ tmp/1/CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpil
 tmp/1/CMakeFiles/Group_src.dir/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/src/rcc.o
 tmp/project+Target_1/groups.cmake
 tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-database-out.log
-project.cbuild-idx.yml
 tmp/.ninja_log
 tmp/1/.ninja_log
 tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-database-out.log
-project.cbuild-idx.yml
 tmp/.ninja_log
 tmp/1/.ninja_deps
 tmp/1/.ninja_log
 tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-database-out.log
+
+# Ignore personal GUI settings
+*.uvguix.*
+*.uvoptx.*
+
+# Ignore VS Code junk
+.vscode/
+*.VC.DB*
+
+project.uvoptx
+project.uvguix.Seif0
+
+# Keil uVision project settings (user-specific)
+*.uvguix.*
+*.uvoptx
+
+# CMSIS-Build / Solution configuration files
+project.cbuild-idx.yml
+project.cbuild-pack.yml
+project.cproject.yml
+project.csolution.yml

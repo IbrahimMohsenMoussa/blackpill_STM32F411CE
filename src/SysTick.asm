@@ -126,4 +126,5 @@ delay_loop
     POP     {R1-R3, PC}
     ENDP
 
+	ALIGN
     END
