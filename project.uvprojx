@@ -504,6 +504,11 @@
               <FileType>2</FileType>
               <FilePath>.\src\ui_driver.s</FilePath>
             </File>
+            <File>
+              <FileName>mpu6050.asm</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\mpu6050.asm</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

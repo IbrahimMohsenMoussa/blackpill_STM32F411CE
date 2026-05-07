@@ -29,3 +29,6 @@ tmp/project+Target_1/src/project+Target_1-stamp/project+Target_1-database-out.lo
 # Ignore VS Code junk
 .vscode/
 *.VC.DB*
+
+project.uvoptx
+project.uvguix.Seif0
