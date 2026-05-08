@@ -45,7 +45,7 @@ Current_Target_Floor     space 4
     EXPORT main
     
     ; --- Hardware & Subsystem Imports ---
-   IMPORT DIO_ToggleLogical
+    IMPORT DIO_ToggleLogical
     IMPORT DIO_ReadLogical
     IMPORT DIO_WriteLogical
     IMPORT PLLInit
@@ -80,6 +80,8 @@ Current_Target_Floor     space 4
     IMPORT brakes_on
     IMPORT brakes_off
     IMPORT EXTI_Pin_Init
+    IMPORT UI_SetScreen
+    IMPORT UI_SetEmergencyReason
 main
 
     ; 1. Set up initial system state
@@ -93,8 +95,8 @@ main
     bl GPIO_Init_All
     bl RTC_Init
     bl SysTick_Init
-    mov     r0, #500
-    bl      SysTick_delay_ms
+    mov r0, #500
+    bl  SysTick_delay_ms
     bl brakes_on
     bl TOF_Init
     bl I2C1_Init
@@ -141,12 +143,6 @@ main_loop
     cmp r1, #1
     bne loop_restart
 
-    ; Crucial RTOS Protection: Do not block CPU for UI while moving
-    ldr r0, =System_State
-    ldrb r1, [r0]
-    cmp r1, #STATE_MOVING
-    beq loop_restart
-
     bl UPDATE_DISPLAY_ROUTINE
 
 loop_restart
@@ -159,6 +155,12 @@ EXECUTE_EMERGENCY
     push {r0-r3, lr}
     movs r0, #5
     bl DFP_PlayImmediate
+
+    movs r0, #0
+    bl UI_SetEmergencyReason
+    movs r0, #4
+    bl UI_SetScreen
+    bl UI_Update
 EMERGENCY_TRAP
     b EMERGENCY_TRAP
 
@@ -311,6 +313,12 @@ within_deadband
 EXECUTE_STOP
     push {r0-r3, lr}
     bl brakes_on
+
+    movs r0, #3
+    bl UI_SetScreen
+    movs r0, #1
+    ldr r1, =Sys_Display_Needs_Update
+    strb r0, [r1]
     
     ldr r1, =Current_Target_Floor
     ldr r1, [r1]
@@ -393,6 +401,13 @@ EXECUTE_START
     push {r0-r3, lr}
     bl brakes_off
     bl Stepper_Enable
+
+    movs r0, #2
+    bl UI_SetScreen
+    movs r0, #1
+    ldr r1, =Sys_Display_Needs_Update
+    strb r0, [r1]
+
     
     ; Transition to MOVING state
     ldr r1, =System_State
@@ -418,6 +433,10 @@ STOP_FLOOR_2
     b STOP_DONE
 
 STOP_DONE
+    movs r0, #0
+    bl UI_SetScreen
+    bl UI_Update
+
     ; Transition back to IDLE so we can take new calls
     ldr r0, =System_State
     movs r1, #STATE_IDLE

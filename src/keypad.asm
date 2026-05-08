@@ -212,20 +212,20 @@ check_val_0
               B end_read_pins
 
 check_val_1
-              LDR r1, =0xF91           ; 0xFF5 - 100 (approx)
+              LDR r1, =0x4F0        ; 0xFF5 - 100 (approx)
               CMP r0, r1
               BLO check_val_2
-              LDR r2, =0x1059          ; 0xFF5 + 100 (approx)
+              LDR r2, =0x5B8           ; 0xFF5 + 100 (approx)
               CMP r0, r2
               BHI check_val_2
               MOV r0, #1
               B end_read_pins
 
 check_val_2
-              LDR r1, =0x4F0           ; 0x554 - 100 (approx)
+              LDR r1, =0xF91        ; 0x554 - 100 (approx)
               CMP r0, r1
               BLO no_valid_pin
-              LDR r2, =0x5B8           ; 0x554 + 100 (approx)
+              LDR r2, =0x1059         ; 0x554 + 100 (approx)
               CMP r0, r2
               BHI no_valid_pin
               MOV r0, #2
@@ -237,3 +237,4 @@ no_valid_pin
 end_read_pins
               POP {r1, r2, PC}
               ENDP
+              END
