@@ -6,4 +6,5 @@ ID_MOTOR_DIR   EQU 3    ; ID 3
 ID_LED_F0     EQU 4    ; ID 4
 ID_LED_F2    EQU 5    ; ID 5
 ID_LED_F1     EQU 6    ; ID 6
+ID_POWER_MONITOR EQU 7 ; ID 7
     END

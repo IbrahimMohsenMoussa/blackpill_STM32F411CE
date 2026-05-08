@@ -43,8 +43,10 @@ Current_Target_Floor     space 4
     thumb
     
     EXPORT main
+    EXPORT EXTI9_5_IRQHandler
     
     ; --- Hardware & Subsystem Imports ---
+    IMPORT Reset_Handler
     IMPORT DIO_ToggleLogical
     IMPORT DIO_ReadLogical
     IMPORT DIO_WriteLogical
@@ -153,14 +155,15 @@ loop_restart
     ; ==============================================================================
 EXECUTE_EMERGENCY
     push {r0-r3, lr}
+    bl stepper_disable
     movs r0, #5
     bl DFP_PlayImmediate
-
     movs r0, #0
     bl UI_SetEmergencyReason
     movs r0, #4
     bl UI_SetScreen
     bl UI_Update
+    
 EMERGENCY_TRAP
     b EMERGENCY_TRAP
 
@@ -483,5 +486,24 @@ LED_ON_FLOOR PROC
 
     pop {r4, pc}
 	ENDP
+
+EXTI9_5_IRQHandler PROC
+    push {r0-r2}
+    
+    ; 1. Clear the EXTI Pending Register (PR) for Line 8
+    ldr r0, =0x40013C00     ; EXTI Base Address
+    ldr r1, [r0, #0x14]     ; Read EXTI_PR
+    orr r1, r1, #(1 << 8)   ; Write 1 to bit 8 to clear the flag
+    str r1, [r0, #0x14]
+    
+    ; 2. Raise the RTOS Emergency Flag
+    ldr r0, =Sys_Emergency_Flag
+    movs r1, #1
+    strb r1, [r0]
+    
+    b EXECUTE_EMERGENCY
+    pop {r0-r2}
+    ENDP
+
     ALIGN 
     end

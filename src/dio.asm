@@ -12,6 +12,7 @@ DIO_Hardware_Map
     DCD GPIOA_BASE, 8 ; Index 4: LED_F0
     DCD GPIOB_BASE, 2 ; Index 5: LED_F1
     DCD GPIOB_BASE, 13 ; Index 6: LED_F2
+    DCD GPIOB_BASE, 8 ; Index 7: ID_POWER_MONITOR (Mapped to PB8)
     
 
     AREA |.text|, CODE, READONLY
