@@ -14,12 +14,12 @@
 ; --------------------------------------------------------------------
 ; Constants
 ; --------------------------------------------------------------------
-DEFAULT_TIME    EQU 0x00165020  ; 21:17:00 in BCD (0x21 for 21 hours, 0x17 for 17 minutes, 0x00 for seconds)
+DEFAULT_TIME    EQU 0x00051100  ; 05:11:00 in BCD (0x05 for 05 hours, 0x11 for 11 minutes, 0x00 for seconds)
 
 ; Corrected DEFAULT_DATE hex (0x002612704 is 36-bit and invalid). 
 ; Format: [23:16] Year, [15:13] WDU, [12:8] Month, [5:0] Day
-; Year 26 (0x26), WDU 4 (0x4), Month 04 (0x04), Day 30 (0x30) => 0x00268430
-DEFAULT_DATE    EQU 0x00268430 ; 30th April 2026, WDU=4 (Thursday)
+; Year 25 (0x25), WDU 6 (0x6), Month 05 (0x05), Day 09 (0x09) => 0x0025C509
+DEFAULT_DATE    EQU 0x0025C509 ; 9th May 2025, WDU=6 (Saturday)
 
 ; --------------------------------------------------------------------
 ; RAM Allocations

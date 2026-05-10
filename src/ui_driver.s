@@ -26,6 +26,7 @@ str_emergency   DCB "EMERGENCY!", 0
 str_powerfail   DCB "SYSTEM HALT", 0
 str_manualstop  DCB "STOP PRESSED", 0
 str_overload    DCB "OVERLOAD", 0
+str_maint       DCB "MAINT REQ'D", 0
 
     ALIGN
 
@@ -113,7 +114,7 @@ UI_SetScreen PROC
 
 ; --------------------------------------------------------------------
 ; UI_SetEmergencyReason (Input R0)
-; 0 = POWERFAIL, 1 = MANUALSTOP, 2 = OVERLOAD
+; 0 = POWERFAIL, 1 = MANUALSTOP, 2 = OVERLOAD, 3 = MAINTENANCE
 ; --------------------------------------------------------------------
 UI_SetEmergencyReason PROC
     push    {r4-r11, lr}
@@ -338,6 +339,8 @@ draw_fault
     beq     fault_manualstop
     cmp     r0, #2
     beq     fault_overload
+    cmp     r0, #3
+    beq     fault_maint
     b       right_pane_end
 
 fault_powerfail
@@ -350,6 +353,11 @@ fault_manualstop
     b       right_pane_end
 fault_overload
     ldr     r0, =str_overload
+    bl      OLED_PrintStr
+    b       right_pane_end
+    
+fault_maint
+    ldr     r0, =str_maint
     bl      OLED_PrintStr
 
 right_pane_end

@@ -75,3 +75,8 @@ project:
         - file: src/UART1_defs.s
         - file: src/exti.asm
         - file: src/brakes.asm
+        - file: src/mpu6050.asm
+        - file: src/servo_driver.s
+        - file: src/fft_math.s
+        - file: src/data_memory.s
+        - file: src/loadcell.s

@@ -210,8 +210,11 @@ TIM_CNT       EQU 0x24
 TIM_PSC       EQU 0x28
 TIM_ARR       EQU 0x2C
 TIM_CCMR1     EQU 0x18
+TIM_CCMR2     EQU 0x1C
 TIM_CCER      EQU 0x20
 TIM_CCR1      EQU 0x34
+TIM_CCR2      EQU 0x38
+TIM_CCR3      EQU 0x3C
 
 ;=========================================================
 ; RTC Register Definitions

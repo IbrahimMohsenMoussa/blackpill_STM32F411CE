@@ -84,8 +84,20 @@ PinConfigTable
     ; Hex: 0x0 8 1 0 0 0 0 0
     DCD     0x08100000
 
+    ; PA0 - Floor 1 Servo -> TIM2_CH1 (Pin=0, Port=A, Mode=AF, OType=PP, Speed=Fast, PUPD=None, AF=1)
+    DCD     0x00020201
+    ; PA1 - Floor 2 Servo -> TIM2_CH2 (Pin=1, Port=A, Mode=AF, OType=PP, Speed=Fast, PUPD=None, AF=1)
+    DCD     0x01020201
+    ; PA2 - Floor 0 Servo -> TIM2_CH3 (Pin=2, Port=A, Mode=AF, OType=PP, Speed=Fast, PUPD=None, AF=1)
+    DCD     0x02020201
 
-   
+    ; PA3 - Load Cell SCK (Pin=3, Port=0(A), Mode=1(Out), OT=0(PP), Spd=2(Fast), PUPD=0(None), AF=0)
+    ; Hex: 0x0 3 0 1 0 2 0 0
+    DCD     0x03010200
+
+    ; PC13 - Load Cell DT (Pin=D(13), Port=2(C), Mode=0(In), OT=0(PP), Spd=0(Low), PUPD=1(PU), AF=0)
+    ; Hex: 0x0 D 2 0 0 0 1 0
+    DCD     0x0D200010
 
     ; End of Table Terminator (Sentinel)
     DCD     0xFFFFFFFF    

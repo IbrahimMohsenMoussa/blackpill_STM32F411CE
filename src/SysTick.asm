@@ -18,6 +18,10 @@ SYSTICK_VAL     EQU     0x08
 Global_Tick_ms          SPACE 4     ; 32-bit absolute system time counter
 RTOS_Display_Counter    SPACE 4     ; 32-bit countdown for display updates
 
+RTOS_Log_Counter        SPACE 4     ; 32-bit countdown for 10ms logging
+Sys_Log_Flag            SPACE 1     ; 1-byte flag to trigger data log
+    EXPORT Sys_Log_Flag
+
     ; ========================================================================
     ; Code Section
     ; ========================================================================
@@ -56,6 +60,11 @@ SysTick_Init PROC
     MOV     R1, #50                   ; Start with 50ms to allow initial system stabilization
     STR     R1, [R2]                ; Initialize display countdown to 50ms
     
+    ; Initialize the 10ms log scheduler
+    LDR     R2, =RTOS_Log_Counter
+    MOV     R1, #10
+    STR     R1, [R2]
+
     ; 4. Write to CTRL: Enable Timer (Bit 0), Enable Interrupt (Bit 1), AHB/8 (Bit 2 = 0)
     MOV     R1, #3                  
     STR     R1, [R0, #SYSTICK_CTRL]
@@ -76,6 +85,19 @@ SysTick_Handler PROC
     ADD     R1, R1, #1
     STR     R1, [R0]
     
+    ; 1.5. Decrement the 10ms log scheduler
+    LDR     R0, =RTOS_Log_Counter
+    LDR     R1, [R0]
+    SUBS    R1, R1, #1
+    STR     R1, [R0]
+    BNE     Skip_Log
+    MOV     R1, #10
+    STR     R1, [R0]
+    LDR     R2, =Sys_Log_Flag
+    MOV     R3, #1
+    STRB    R3, [R2]
+Skip_Log
+
     ; 2. Decrement the 200ms display scheduler
     LDR     R0, =RTOS_Display_Counter
     LDR     R1, [R0]

@@ -185,8 +185,10 @@ DFP_PlayTrack PROC
         MOV     R1, R0, LSR #8      ; High byte
         AND     R2, R0, #0xFF       ; Low byte
         
-        ; Send play command
-        MOV     R0, #DFP_CMD_PLAY_TRACK
+        ; Send "Play MP3 Folder" command (0x12) instead of standard Play (0x03)
+        ; This forces the module to read filenames (0001.mp3) instead of FAT table index
+        ; NOTE: Your files MUST be placed inside a folder named "MP3" on the SD Card!
+        MOV     R0, #0x12
         BL      DFP_sendCommand
         
         POP     {R0-R2, PC}

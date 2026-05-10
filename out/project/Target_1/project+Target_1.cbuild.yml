@@ -212,6 +212,16 @@ build:
           category: sourceAsm
         - file: ../../../src/brakes.asm
           category: sourceAsm
+        - file: ../../../src/mpu6050.asm
+          category: sourceAsm
+        - file: ../../../src/servo_driver.s
+          category: sourceAsm
+        - file: ../../../src/fft_math.s
+          category: sourceAsm
+        - file: ../../../src/data_memory.s
+          category: sourceAsm
+        - file: ../../../src/loadcell.s
+          category: sourceAsm
   constructed-files:
     - file: ../../../RTE/_Target_1/RTE_Components.h
       category: header

@@ -27,6 +27,7 @@ CL_KI           equ 2
 
     INCLUDE stm32f411.inc
     INCLUDE hardware_config.inc
+    INCLUDE DFPlayer_defs.s
 System_State             space 1
 Sys_Emergency_Flag       space 1
 Sys_Power_Restored       space 1
@@ -84,6 +85,14 @@ Current_Target_Floor     space 4
     IMPORT EXTI_Pin_Init
     IMPORT UI_SetScreen
     IMPORT UI_SetEmergencyReason
+    IMPORT MPU6050_Init
+	IMPORT MPU6050_ReadAccelRaw
+    IMPORT Servo_Init
+    IMPORT Servo_OpenDoor
+    IMPORT Servo_CloseDoor
+    IMPORT LoadCell_Tare
+    IMPORT LoadCell_CheckOverload
+
 main
 
     ; 1. Set up initial system state
@@ -108,6 +117,22 @@ main
     bl Keys_init
     bl Stepper_Init
     bl Stepper_Enable
+    bl MPU6050_Init
+    bl Servo_Init
+    bl OLED_ClearBuffer
+    bl UI_Update
+
+    bl LoadCell_Tare
+
+; accloop 
+;     bl MPU6050_ReadAccelRaw
+;     mov r3, r0          ; R3 = Z axis
+;     mov r4, r1          ; R4 = Y axis
+;     mov r5, r2          ; R5 = X axis
+;     mov r0, #500
+;     bl SysTick_delay_ms
+
+;     b accloop
     
 
     ; Initialize PB8 EXTI (Power Monitor)
@@ -119,6 +144,8 @@ main
     ; ==============================================================================
     ; Main Event Router (RTOS Scheduler)
     ; ==============================================================================
+
+
 main_loop
     ; --- Priority 1: Emergency Preemption (Highest) ---
     ldr r0, =Sys_Emergency_Flag
@@ -155,8 +182,18 @@ loop_restart
     ; ==============================================================================
 EXECUTE_EMERGENCY
     push {r0-r3, lr}
-    bl stepper_disable
-    movs r0, #5
+    
+    ; 1. Read PB8 state to determine Rising (Power Restored) vs Falling (Power Fail)
+    mov r0, #ID_POWER_MONITOR
+    bl DIO_ReadLogical
+    cmp r0, #1
+    beq Reset_Handler       ; Rising edge: Reboot the MCU directly
+    
+    ; 2. Falling edge (Power Fail): Pull brakes on immediately
+    bl brakes_on
+    
+    ; 3. Execute Fault UI and Audio
+    movs r0, #TRACK_POWER_FAIL
     bl DFP_PlayImmediate
     movs r0, #0
     bl UI_SetEmergencyReason
@@ -165,6 +202,9 @@ EXECUTE_EMERGENCY
     bl UI_Update
     
 EMERGENCY_TRAP
+    ; mov r0, #50
+    ; bl SysTick_delay_ms
+    bl UI_Update
     b EMERGENCY_TRAP
 
 EXECUTE_MOVING
@@ -308,6 +348,9 @@ skip_display
     b loop_moving
 
 within_deadband
+    movs r0, #0
+    bl Stepper_SetSpeed        ; Command hardware timer to stop PWM pulses immediately
+
     ldr r0, =System_State
     movs r1, #STATE_STOP
     strb r1, [r0]
@@ -328,30 +371,56 @@ EXECUTE_STOP
     
     ldr r2, =FLOOR0_SP
     cmp r1, r2
-    beq STOP_FLOOR_0
+    beq.w STOP_FLOOR_0
     
     ldr r2, =FLOOR1_SP
     cmp r1, r2
-    beq STOP_FLOOR_1
+    beq.w STOP_FLOOR_1
     
     ldr r2, =FLOOR2_SP
     cmp r1, r2
-    beq STOP_FLOOR_2
+    beq.w STOP_FLOOR_2
     
     b STOP_DONE
 
 EXECUTE_IDLE
     ; --- 1. Check Inside Cabin Keypad ---
     bl Decode_Keypad       ; Returns ASCII in r0, or 0 if none
+    cmp r0, #0             ; 0 means no key pressed
+    beq check_external
+    
+    ; Debounce Keypad
+    push {r0}
+    movs r0, #20           ; 20ms debounce delay
+    bl SysTick_delay_ms
+    bl Decode_Keypad
+    pop {r1}
+    cmp r0, r1             ; Ensure it's the exact same key
+    bne IDLE_END
+
     cmp r0, #'0'
     beq IDLE_FLOOR_0
     cmp r0, #'1'
     beq IDLE_FLOOR_1
     cmp r0, #'2'
     beq IDLE_FLOOR_2
+    b IDLE_END
 
+check_external
     ; --- 2. Check External Hall Calling Buttons ---
     bl Read_Button_Values  ; Returns 0, 1, 2, or 0xFF
+    cmp r0, #0xFF          ; 0xFF means no button pressed
+    beq IDLE_END
+    
+    ; Debounce External Buttons
+    push {r0}
+    movs r0, #20           ; 20ms debounce delay
+    bl SysTick_delay_ms
+    bl Read_Button_Values
+    pop {r1}
+    cmp r0, r1             ; Ensure it's the exact same key
+    bne IDLE_END
+
     cmp r0, #0
     beq IDLE_FLOOR_0
     cmp r0, #1
@@ -370,6 +439,11 @@ IDLE_FLOOR_0
     bl UI_SetTargetFloor
     movs r0, #0            ; Turn on physical LED
     bl LED_ON_FLOOR
+    
+    ldr r1, =UI_CurrentFloor
+    ldrb r2, [r1]
+    cmp r2, #0
+    beq IDLE_ALREADY_THERE
     b IDLE_TRANSITION
 
 IDLE_FLOOR_1
@@ -380,6 +454,11 @@ IDLE_FLOOR_1
     bl UI_SetTargetFloor
     movs r0, #1            ; Turn on physical LED
     bl LED_ON_FLOOR
+    
+    ldr r1, =UI_CurrentFloor
+    ldrb r2, [r1]
+    cmp r2, #1
+    beq IDLE_ALREADY_THERE
     b IDLE_TRANSITION
 
 IDLE_FLOOR_2
@@ -390,7 +469,18 @@ IDLE_FLOOR_2
     bl UI_SetTargetFloor
     movs r0, #2            ; Turn on physical LED
     bl LED_ON_FLOOR
+    
+    ldr r1, =UI_CurrentFloor
+    ldrb r2, [r1]
+    cmp r2, #2
+    beq IDLE_ALREADY_THERE
     b IDLE_TRANSITION
+
+IDLE_ALREADY_THERE
+    ldr r1, =System_State
+    movs r2, #STATE_STOP
+    strb r2, [r1]
+    b loop_restart
 
 IDLE_TRANSITION
     ldr r1, =System_State
@@ -402,8 +492,38 @@ IDLE_END
 
 EXECUTE_START
     push {r0-r3, lr}
+
+check_overload
+    bl LoadCell_CheckOverload
+    cmp r0, #0
+    beq safe_to_start
+    
+    movs r0, #TRACK_OVERLOAD
+    bl DFP_PlayImmediate
+    movs r0, #2
+    bl UI_SetEmergencyReason
+    movs r0, #4
+    bl UI_SetScreen
+
+    movs r4, #300                ; Counter for 40 updates
+overload_ui_loop
+    bl UI_Update
+    subs r4, r4, #1
+    bne overload_ui_loop
+
+    b check_overload
+
+safe_to_start
     bl brakes_off
     bl Stepper_Enable
+    
+    ; Close all doors before moving
+    movs r0, #0
+    bl Servo_CloseDoor
+    movs r0, #1
+    bl Servo_CloseDoor
+    movs r0, #2
+    bl Servo_CloseDoor
 
     movs r0, #2
     bl UI_SetScreen
@@ -421,17 +541,32 @@ EXECUTE_START
     b loop_restart
 
 STOP_FLOOR_0
-    movs r0, #1
+    movs r0, #0
+    bl Servo_OpenDoor
+    
+    ldr r0, =100
+    bl SysTick_delay_ms
+    movs r0, #TRACK_GROUND
     bl DFP_PlayImmediate
     b STOP_DONE
 
 STOP_FLOOR_1
-    movs r0, #2
+    movs r0, #1
+    bl Servo_OpenDoor
+    
+    ldr r0, =100
+    bl SysTick_delay_ms
+    movs r0, #TRACK_FIRST
     bl DFP_PlayImmediate
     b STOP_DONE
 
 STOP_FLOOR_2
-    movs r0, #3
+    movs r0, #2
+    bl Servo_OpenDoor
+    
+    ldr r0, =100
+    bl SysTick_delay_ms
+    movs r0, #TRACK_SECOND
     bl DFP_PlayImmediate
     b STOP_DONE
 
@@ -501,8 +636,8 @@ EXTI9_5_IRQHandler PROC
     movs r1, #1
     strb r1, [r0]
     
-    b EXECUTE_EMERGENCY
     pop {r0-r2}
+    bx lr
     ENDP
 
     ALIGN 
