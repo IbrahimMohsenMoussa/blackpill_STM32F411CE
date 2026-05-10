@@ -3,7 +3,7 @@
 <title>Static Call Graph - [/home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/out/project/Target_1/project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image /home/ibrahim-mohsen/Microprocessors_keil/blackpill_STM32F411CE/out/project/Target_1/project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6240002: Last Updated: Mon May 11 01:56:06 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6240002: Last Updated: Mon May 11 02:22:02 2026
 <BR><P>
 <H3>Maximum Stack Usage =         96 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -274,7 +274,7 @@ Global Symbols
 
 <P><STRONG><a name="[60]"></a>RCC_APB2_Enable</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, rcc.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
-<LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_Pin_Init
+<LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_Pin_Init
 <LI><a href="#[6c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TOF_Init
 <LI><a href="#[5f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ADC_Init
 </UL>
@@ -347,7 +347,7 @@ Global Symbols
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Init
 <LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DFP_Init
 <LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Brakes_Release
-<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Brakes_ApplySlow
+<LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Brakes_ApplySlow
 <LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Brakes_ApplyFull
 <LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -434,7 +434,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[97]"></a>TOF_Read_Distance</STRONG> (Thumb, 142 bytes, Stack size 0 bytes, tof400f_driver.o(.text))
+<P><STRONG><a name="[95]"></a>TOF_Read_Distance</STRONG> (Thumb, 142 bytes, Stack size 0 bytes, tof400f_driver.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -563,7 +563,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[99]"></a>UI_SetCurrentFloor</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, ui_driver.o(.text))
+<P><STRONG><a name="[97]"></a>UI_SetCurrentFloor</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, ui_driver.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -571,11 +571,11 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[96]"></a>UI_SetScreen</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, ui_driver.o(.text))
+<P><STRONG><a name="[94]"></a>UI_SetScreen</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, ui_driver.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[95]"></a>UI_SetEmergencyReason</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, ui_driver.o(.text))
+<P><STRONG><a name="[93]"></a>UI_SetEmergencyReason</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, ui_driver.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -598,7 +598,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[4f]"></a>main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, main.o(.text))
-<BR><BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Servo_OpenDoor
+<BR><BR>[Calls]<UL><LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Servo_OpenDoor
 <LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Servo_Init
 <LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Servo_CloseDoor
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI1_RST_Deassert
@@ -606,29 +606,29 @@ Global Symbols
 <LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI1_Init
 <LI><a href="#[0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Reset_Handler
 <LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MPU6050_Init
-<LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Request
+<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Request
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Init
-<LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Anticoll
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Anticoll
 <LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LoadCell_Tare
 <LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LoadCell_CheckOverload
-<LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_Pin_Init
-<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DFP_PlayImmediate
+<LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EXTI_Pin_Init
+<LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DFP_PlayImmediate
 <LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DFP_Init
 <LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Brakes_Init
-<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Brakes_ApplySlow
+<LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Brakes_ApplySlow
 <LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_ON_FLOOR
 <LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_Update_Chunked
 <LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_Update
-<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_SetEmergencyReason
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_SetScreen
+<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_SetEmergencyReason
+<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_SetScreen
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_SetTargetFloor
-<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_SetCurrentFloor
+<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_SetCurrentFloor
 <LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UI_Init
 <LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_ClearBuffer
 <LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OLED_Init
 <LI><a href="#[6f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTC_Init
 <LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2C1_Init
-<LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TOF_Read_Distance
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TOF_Read_Distance
 <LI><a href="#[6c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TOF_Init
 <LI><a href="#[6b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Stepper_SetSpeed
 <LI><a href="#[6a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Stepper_SetDirection
@@ -649,7 +649,7 @@ Global Symbols
 <P><STRONG><a name="[1d]"></a>EXTI9_5_IRQHandler</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, main.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f411xe.o(RESET)
 </UL>
-<P><STRONG><a name="[92]"></a>EXTI_Pin_Init</STRONG> (Thumb, 176 bytes, Stack size 0 bytes, exti.o(.text))
+<P><STRONG><a name="[90]"></a>EXTI_Pin_Init</STRONG> (Thumb, 176 bytes, Stack size 0 bytes, exti.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RCC_APB2_Enable
 </UL>
 <BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -665,7 +665,7 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_delay_ms
 </UL>
 
-<P><STRONG><a name="[93]"></a>Brakes_ApplySlow</STRONG> (Thumb, 26 bytes, Stack size 0 bytes, brakes.o(.text))
+<P><STRONG><a name="[91]"></a>Brakes_ApplySlow</STRONG> (Thumb, 26 bytes, Stack size 0 bytes, brakes.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_delay_ms
 </UL>
 <BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -698,7 +698,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[98]"></a>Servo_OpenDoor</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, servo_driver.o(.text))
+<P><STRONG><a name="[96]"></a>Servo_OpenDoor</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, servo_driver.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -727,9 +727,9 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_ToCard
 <LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_AntennaOn
-<LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Request
+<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Request
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Init
-<LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Anticoll
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Anticoll
 </UL>
 
 <P><STRONG><a name="[f1]"></a>MFRC522_ReadReg</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, mfrc522.o(.text), UNUSED)
@@ -763,18 +763,18 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_WriteRegister
 <LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_ReadRegister
 </UL>
-<BR>[Called By]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Request
-<LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Anticoll
+<BR>[Called By]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Request
+<LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_Anticoll
 </UL>
 
-<P><STRONG><a name="[90]"></a>MFRC522_Request</STRONG> (Thumb, 42 bytes, Stack size 0 bytes, mfrc522.o(.text))
+<P><STRONG><a name="[98]"></a>MFRC522_Request</STRONG> (Thumb, 42 bytes, Stack size 0 bytes, mfrc522.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_ToCard
 <LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_WriteRegister
 </UL>
 <BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[91]"></a>MFRC522_Anticoll</STRONG> (Thumb, 106 bytes, Stack size 0 bytes, mfrc522.o(.text))
+<P><STRONG><a name="[99]"></a>MFRC522_Anticoll</STRONG> (Thumb, 106 bytes, Stack size 0 bytes, mfrc522.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_ToCard
 <LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MFRC522_WriteRegister
 </UL>
@@ -1163,7 +1163,7 @@ Global Symbols
 <P><STRONG><a name="[ba]"></a>DFP_PlayTrack</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, DFPlayer.o(DFPlayer_Driver))
 <BR><BR>[Calls]<UL><LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DFP_sendCommand
 </UL>
-<BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DFP_PlayImmediate
+<BR>[Called By]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DFP_PlayImmediate
 <LI><a href="#[88]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DFP_Init
 </UL>
 
@@ -1197,7 +1197,7 @@ Global Symbols
 <LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_delay_ms
 </UL>
 
-<P><STRONG><a name="[94]"></a>DFP_PlayImmediate</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, DFPlayer.o(DFPlayer_Driver))
+<P><STRONG><a name="[92]"></a>DFP_PlayImmediate</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, DFPlayer.o(DFPlayer_Driver))
 <BR><BR>[Calls]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DFP_PlayTrack
 </UL>
 <BR>[Called By]<UL><LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main

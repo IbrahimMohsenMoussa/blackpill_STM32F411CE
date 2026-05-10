@@ -34,6 +34,7 @@ Sys_Power_Restored       space 1
 Sys_Display_Needs_Update space 1
 Current_Target_Floor     space 4
 UID_Buffer               space 8     ; Allocate 8 bytes for RFID responses
+Sys_Keypad_Unlocked      space 1     ; 1 = Unlocked, 0 = Locked
 
     ; Export required variable(s) for external drivers
     export Sys_Display_Needs_Update
@@ -113,6 +114,11 @@ main
     ldr r0, =System_State
     movs r1, #STATE_IDLE
     strb r1, [r0]
+    
+    ; Initialize keypad to locked state
+    ldr r0, =Sys_Keypad_Unlocked
+    movs r1, #0
+    strb r1, [r0]
 
     ; 2. Hardware Initialization Sequence
     bl PLLInit
@@ -157,42 +163,6 @@ main
     ; 3. Initialize MFRC522 (Soft Reset, Timer Setup, Antenna On)
     bl MFRC522_Init
 
-   ; =========================================================
-    ; 4. Card Polling Loop
-; =========================================================
-    ; 4. Card Polling Loop
-    ; =========================================================
-; =========================================================
-    ; 4. Card Polling Loop
-    ; =========================================================
-poll_card
-    ; Delay 50ms between pings to avoid overwhelming the bus
-    mov r0, #50
-    bl SysTick_delay_ms
-
-    ; --- Step A: Ping the Card ---
-    mov r0, #0x26           ; PICC_REQIDL command
-    ldr r1, =UID_Buffer     ; Safe buffer to catch the 2-byte ATQA
-    bl MFRC522_Request
-    
-    cmp r0, #0              ; 0 = MI_OK
-    bne poll_card           ; If no card, keep polling
-
-    ; --- Step B: Read the UID (Anticollision) ---
-    ldr r0, =UID_Buffer     ; Destination pointer for the 5-byte UID
-    bl MFRC522_Anticoll
-
-    cmp r0, #0              ; 0 = MI_OK (Checksum passed)
-    bne poll_card           ; If collision or bad checksum, restart polling
-
-    ; =========================================================
-    ; 5. SUCCESS! UID IS IN SRAM
-    ; =========================================================
-uid_read_success
-    b uid_read_success      ; *** PUT YOUR BREAKPOINT HERE ***
-
-; accloop 
-;     bl MPU6050_ReadAccelRaw
 ;     mov r3, r0          ; R3 = Z axis
 ;     mov r4, r1          ; R4 = Y axis
 ;     mov r5, r2          ; R5 = X axis
@@ -490,7 +460,59 @@ EXECUTE_STOP
     b STOP_DONE
 
 EXECUTE_IDLE
-    ; --- 1. Check Inside Cabin Keypad ---
+    ; --- 1. Check RFID Phase (Unlock Keypad) ---
+    ldr r0, =Sys_Keypad_Unlocked
+    ldrb r1, [r0]
+    cmp r1, #1
+    beq check_keypad        ; If already unlocked, skip RFID polling
+
+    ; Clear UID_Buffer (prevent memory ghosting)
+    ldr r0, =UID_Buffer
+    movs r1, #0
+    str r1, [r0]
+
+    ; Request Card
+    movs r0, #0x26          ; PICC_REQIDL command
+    ldr r1, =UID_Buffer
+    bl MFRC522_Request
+    cmp r0, #0              ; 0 = MI_OK
+    bne check_keypad        ; If no card, move to keypad phase
+
+    ; Read UID (Anticollision)
+    ldr r0, =UID_Buffer
+    bl MFRC522_Anticoll
+    cmp r0, #0              ; 0 = MI_OK
+    bne check_keypad        ; If collision or read error, move to keypad phase
+
+    ; Security Verification (2 Authorized Cards)
+    ldr r1, =UID_Buffer
+    ldr r0, [r1]            ; Load the first 4 bytes of UID into r0
+
+    ldr r2, =0x0333CD2A     ; Card 1 VIP
+    cmp r0, r2
+    beq vip_authorized
+
+    ldr r2, =0x01C10B9A     ; Card 2 VIP
+    cmp r0, r2
+    beq vip_authorized
+
+    b vip_unauthorized
+
+vip_authorized
+    ldr r0, =Sys_Keypad_Unlocked
+    movs r1, #1
+    strb r1, [r0]           ; Set unlocked state to 1
+    movs r0, #TRACK_GROUND  ; Success sound
+    bl DFP_PlayImmediate
+    b IDLE_END              ; Wait for user input on next cycle
+
+vip_unauthorized
+    movs r0, #TRACK_OVERLOAD ; Error buzz
+    bl DFP_PlayImmediate
+    b IDLE_END
+
+check_keypad
+    ; --- 2. Check Inside Cabin Keypad Phase ---
     bl Decode_Keypad       ; Returns ASCII in r0, or 0 if none
     cmp r0, #0             ; 0 means no key pressed
     beq check_external
@@ -502,7 +524,17 @@ EXECUTE_IDLE
     bl Decode_Keypad
     pop {r1}
     cmp r0, r1             ; Ensure it's the exact same key
-    bne IDLE_END
+    bne check_external
+
+    ; Key pressed, check if unlocked
+    ldr r2, =Sys_Keypad_Unlocked
+    ldrb r3, [r2]
+    cmp r3, #0
+    beq keypad_locked
+
+    ; Keypad is unlocked! Instantly re-lock for single use
+    movs r3, #0
+    strb r3, [r2]
 
     cmp r0, #'0'
     beq IDLE_FLOOR_0
@@ -510,10 +542,15 @@ EXECUTE_IDLE
     beq IDLE_FLOOR_1
     cmp r0, #'2'
     beq IDLE_FLOOR_2
+    b check_external
+
+keypad_locked
+    movs r0, #TRACK_OVERLOAD ; Error buzz for locked keypad
+    bl DFP_PlayImmediate
     b IDLE_END
 
 check_external
-    ; --- 2. Check External Hall Calling Buttons ---
+    ; --- 3. Check External Hall Calling Buttons ---
     bl Read_Button_Values  ; Returns 0, 1, 2, or 0xFF
     cmp r0, #0xFF          ; 0xFF means no button pressed
     beq IDLE_END
@@ -533,8 +570,6 @@ check_external
     beq IDLE_FLOOR_1
     cmp r0, #2
     beq IDLE_FLOOR_2
-
-    ; --- 3. Nothing Pressed (e.g., 0xFF) ---
     b IDLE_END
 
 IDLE_FLOOR_0
@@ -594,6 +629,7 @@ IDLE_TRANSITION
     strb r2, [r1]          ; State transition triggers next cycle execution
 
 IDLE_END
+    bl UI_Update
     b loop_restart
 
 EXECUTE_START
