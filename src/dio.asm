@@ -15,6 +15,8 @@ DIO_Hardware_Map
     DCD GPIOB_BASE, 8 ; Index 7: ID_POWER_MONITOR (Mapped to PB8)
     DCD GPIOA_BASE, 3 ; Index 8: ID_LC_SCK (Mapped to PA3)
     DCD GPIOC_BASE, 13; Index 9: ID_LC_DT (Mapped to PC13)
+    DCD GPIOB_BASE, 12; Index 10: ID_RFID_CS (Mapped to PB12)
+    DCD GPIOB_BASE, 10; Index 11: ID_RFID_RST (Mapped to PB10)
     
 
     AREA |.text|, CODE, READONLY

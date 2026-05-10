@@ -80,3 +80,5 @@ project:
         - file: src/fft_math.s
         - file: src/data_memory.s
         - file: src/loadcell.s
+        - file: src/mfrc522.s
+        - file: src/spi.s

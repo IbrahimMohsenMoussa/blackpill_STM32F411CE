@@ -9,4 +9,6 @@ ID_LED_F1     EQU 6    ; ID 6
 ID_POWER_MONITOR EQU 7 ; ID 7
 ID_LC_SCK     EQU 8    ; ID 8
 ID_LC_DT      EQU 9    ; ID 9
+ID_RFID_CS    EQU 10   ; ID 10
+ID_RFID_RST   EQU 11   ; ID 11
     END

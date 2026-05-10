@@ -33,6 +33,7 @@ Sys_Emergency_Flag       space 1
 Sys_Power_Restored       space 1
 Sys_Display_Needs_Update space 1
 Current_Target_Floor     space 4
+UID_Buffer               space 8     ; Allocate 8 bytes for RFID responses
 
     ; Export required variable(s) for external drivers
     export Sys_Display_Needs_Update
@@ -80,8 +81,6 @@ Current_Target_Floor     space 4
     IMPORT UI_Update_Chunked
     IMPORT DFP_Init
     IMPORT DFP_PlayImmediate
-    IMPORT brakes_on
-    IMPORT brakes_off
     IMPORT EXTI_Pin_Init
     IMPORT UI_SetScreen
     IMPORT UI_SetEmergencyReason
@@ -92,9 +91,24 @@ Current_Target_Floor     space 4
     IMPORT Servo_CloseDoor
     IMPORT LoadCell_Tare
     IMPORT LoadCell_CheckOverload
+    IMPORT Brakes_Init
+    IMPORT Brakes_ApplyFull
+    IMPORT Brakes_ApplySlow
+    IMPORT Brakes_Release
+
+    ; --- MFRC522 Test Imports ---
+    IMPORT SPI1_Init
+    IMPORT SPI1_RST_Assert
+    IMPORT SPI1_RST_Deassert
+    IMPORT MFRC522_ReadRegister
+    IMPORT MFRC522_WriteRegister
+    IMPORT MFRC522_Init
+    IMPORT SPI1_TransmitReceive
+    IMPORT MFRC522_Request
+    IMPORT MFRC522_Anticoll
 
 main
-
+    
     ; 1. Set up initial system state
     ldr r0, =System_State
     movs r1, #STATE_IDLE
@@ -108,7 +122,7 @@ main
     bl SysTick_Init
     mov r0, #500
     bl  SysTick_delay_ms
-    bl brakes_on
+    bl Brakes_Init
     bl TOF_Init
     bl I2C1_Init
     bl OLED_Init
@@ -123,6 +137,59 @@ main
     bl UI_Update
 
     bl LoadCell_Tare
+
+    ; ==========================================================================
+    ; MFRC522 SPI Driver Test Sequence
+    ; ==========================================================================
+    ; 1. Initialize SPI1
+    bl SPI1_Init
+
+    ; 2. Hard Reset the MFRC522 (Drive LOW, delay, Drive HIGH)
+    bl SPI1_RST_Assert
+    mov r0, #10
+    bl SysTick_delay_ms
+    bl SPI1_RST_Deassert
+
+    ; Delay 50ms for oscillator stabilization after hard reset
+    mov r0, #50
+    bl SysTick_delay_ms
+
+    ; 3. Initialize MFRC522 (Soft Reset, Timer Setup, Antenna On)
+    bl MFRC522_Init
+
+   ; =========================================================
+    ; 4. Card Polling Loop
+; =========================================================
+    ; 4. Card Polling Loop
+    ; =========================================================
+; =========================================================
+    ; 4. Card Polling Loop
+    ; =========================================================
+poll_card
+    ; Delay 50ms between pings to avoid overwhelming the bus
+    mov r0, #50
+    bl SysTick_delay_ms
+
+    ; --- Step A: Ping the Card ---
+    mov r0, #0x26           ; PICC_REQIDL command
+    ldr r1, =UID_Buffer     ; Safe buffer to catch the 2-byte ATQA
+    bl MFRC522_Request
+    
+    cmp r0, #0              ; 0 = MI_OK
+    bne poll_card           ; If no card, keep polling
+
+    ; --- Step B: Read the UID (Anticollision) ---
+    ldr r0, =UID_Buffer     ; Destination pointer for the 5-byte UID
+    bl MFRC522_Anticoll
+
+    cmp r0, #0              ; 0 = MI_OK (Checksum passed)
+    bne poll_card           ; If collision or bad checksum, restart polling
+
+    ; =========================================================
+    ; 5. SUCCESS! UID IS IN SRAM
+    ; =========================================================
+uid_read_success
+    b uid_read_success      ; *** PUT YOUR BREAKPOINT HERE ***
 
 ; accloop 
 ;     bl MPU6050_ReadAccelRaw
@@ -145,6 +212,24 @@ main
     ; Main Event Router (RTOS Scheduler)
     ; ==============================================================================
 
+; loopbrakes
+   
+;     bl Brakes_ApplyFull
+;     ldr r0, =1000
+;     bl SysTick_delay_ms
+;     bl Brakes_Release
+;     ldr r0, =3000
+;     bl SysTick_delay_ms
+
+
+
+;     b loopbrakes
+
+
+
+
+
+
 
 main_loop
     ; --- Priority 1: Emergency Preemption (Highest) ---
@@ -152,7 +237,7 @@ main_loop
     ldrb r1, [r0]
     cmp r1, #1
     beq.w EXECUTE_EMERGENCY
-
+    LTORG
     ; --- Priority 2: Core State Machine ---
     ldr r0, =System_State
     ldrb r1, [r0]
@@ -190,8 +275,9 @@ EXECUTE_EMERGENCY
     beq Reset_Handler       ; Rising edge: Reboot the MCU directly
     
     ; 2. Falling edge (Power Fail): Pull brakes on immediately
-    bl brakes_on
-    
+     ; Quick brake release to prevent mechanical strain, but still signal the emergency state
+    bl Brakes_ApplySlow
+   
     ; 3. Execute Fault UI and Audio
     movs r0, #TRACK_POWER_FAIL
     bl DFP_PlayImmediate
@@ -200,12 +286,33 @@ EXECUTE_EMERGENCY
     movs r0, #4
     bl UI_SetScreen
     bl UI_Update
-    
+  
 EMERGENCY_TRAP
-    ; mov r0, #50
-    ; bl SysTick_delay_ms
+   
+  
+
+    bl TOF_Read_Distance
+    ldr r1, =0xFFFFFFFF           ; 0xFFFFFFFF means sensor error
+    cmp r0, r1
+    beq continue_trap
+
+    ldr r1, =FLOOR0_SP
+    add r1, r1, #10               ; Add 10mm tolerance to the setpoint
+    cmp r0, r1
+    ble floor_0_reached
+
+continue_trap
     bl UI_Update
     b EMERGENCY_TRAP
+
+floor_0_reached
+    bl Brakes_ApplySlow
+    movs r0, #0
+    bl Servo_OpenDoor
+
+trap_halt
+    bl UI_Update
+    b trap_halt
 
 EXECUTE_MOVING
     ldr r5, =Current_Target_Floor
@@ -358,7 +465,6 @@ within_deadband
 
 EXECUTE_STOP
     push {r0-r3, lr}
-    bl brakes_on
 
     movs r0, #3
     bl UI_SetScreen
@@ -514,7 +620,6 @@ overload_ui_loop
     b check_overload
 
 safe_to_start
-    bl brakes_off
     bl Stepper_Enable
     
     ; Close all doors before moving

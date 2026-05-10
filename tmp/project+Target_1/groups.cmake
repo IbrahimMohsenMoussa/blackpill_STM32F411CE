@@ -28,6 +28,8 @@ add_library(Group_src OBJECT
   "${SOLUTION_ROOT}/src/fft_math.s"
   "${SOLUTION_ROOT}/src/data_memory.s"
   "${SOLUTION_ROOT}/src/loadcell.s"
+  "${SOLUTION_ROOT}/src/mfrc522.s"
+  "${SOLUTION_ROOT}/src/spi.s"
 )
 target_include_directories(Group_src PUBLIC
   $<TARGET_PROPERTY:${CONTEXT},INTERFACE_INCLUDE_DIRECTORIES>
@@ -251,5 +253,21 @@ set(COMPILE_DEFINITIONS
 )
 cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
 set_source_files_properties("${SOLUTION_ROOT}/src/loadcell.s" PROPERTIES
+  COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
+)
+set(COMPILE_DEFINITIONS
+  STM32F411xE
+  _RTE_
+)
+cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
+set_source_files_properties("${SOLUTION_ROOT}/src/mfrc522.s" PROPERTIES
+  COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
+)
+set(COMPILE_DEFINITIONS
+  STM32F411xE
+  _RTE_
+)
+cbuild_set_defines(AS_ARM COMPILE_DEFINITIONS)
+set_source_files_properties("${SOLUTION_ROOT}/src/spi.s" PROPERTIES
   COMPILE_FLAGS "${COMPILE_DEFINITIONS}"
 )

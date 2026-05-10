@@ -99,6 +99,17 @@ PinConfigTable
     ; Hex: 0x0 D 2 0 0 0 1 0
     DCD     0x0D200010
 
+    ; PB9 - Mechanical Brake Servo -> TIM4_CH4 (Pin=9, Port=1(B), Mode=2(AF), OType=0(PP), Speed=2(Fast), PUPD=0, AF=2)
+    ; Hex: 0x0 9 1 2 0 2 0 2
+    DCD     0x09120202
+
+    ; SPI1 & External Hardware Control Pins
+    DCD     0x05020205    ; PA5 (SPI1 SCK) -> AF5, Push-Pull, Fast
+    DCD     0x06020215    ; PA6 (SPI1 MISO) -> AF5, Push-Pull, Fast, Pull-up
+    DCD     0x07020205    ; PA7 (SPI1 MOSI) -> AF5, Push-Pull, Fast
+    DCD     0x0C110200    ; PB12 (SPI CS) -> Out, Push-Pull, Fast
+    DCD     0x0A110200    ; PB10 (SPI RST) -> Out, Push-Pull, Fast
+
     ; End of Table Terminator (Sentinel)
     DCD     0xFFFFFFFF    
 

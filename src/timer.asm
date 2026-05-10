@@ -85,16 +85,16 @@ TIM3_PWM_Init PROC
     str r1, [r0, #RCC_AHB1ENR]
     
     ; 2. Configure PA6 for Alternate Function (AF2 = TIM3)
-    ldr r0, =GPIOA_BASE
-    ldr r1, [r0, #GPIO_MODER]
-    bic r1, r1, #(3 :SHL: 12)   ; Clear bits 12, 13
-    orr r1, r1, #(2 :SHL: 12)   ; Set PA6 to AF mode (10)
-    str r1, [r0, #GPIO_MODER]
+    ; ldr r0, =GPIOA_BASE
+    ; ldr r1, [r0, #GPIO_MODER]
+    ; bic r1, r1, #(3 :SHL: 12)   ; Clear bits 12, 13
+    ; orr r1, r1, #(2 :SHL: 12)   ; Set PA6 to AF mode (10)
+    ; str r1, [r0, #GPIO_MODER]
     
-    ldr r1, [r0, #GPIO_AFRL]
-    bic r1, r1, #(0xF :SHL: 24) ; Clear AF bits for PA6 (bits 24-27)
-    orr r1, r1, #(2 :SHL: 24)   ; Set PA6 to AF2 (0010)
-    str r1, [r0, #GPIO_AFRL]
+    ; ldr r1, [r0, #GPIO_AFRL]
+    ; bic r1, r1, #(0xF :SHL: 24) ; Clear AF bits for PA6 (bits 24-27)
+    ; orr r1, r1, #(2 :SHL: 24)   ; Set PA6 to AF2 (0010)
+    ; str r1, [r0, #GPIO_AFRL]
     
     ; 3. Enable TIM3 Clock
     ldr r0, =RCC_BASE

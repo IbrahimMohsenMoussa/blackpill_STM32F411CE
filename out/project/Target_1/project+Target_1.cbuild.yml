@@ -222,6 +222,10 @@ build:
           category: sourceAsm
         - file: ../../../src/loadcell.s
           category: sourceAsm
+        - file: ../../../src/mfrc522.s
+          category: sourceAsm
+        - file: ../../../src/spi.s
+          category: sourceAsm
   constructed-files:
     - file: ../../../RTE/_Target_1/RTE_Components.h
       category: header
