@@ -64,5 +64,7 @@ TRACK_FIRST             EQU     2
 TRACK_SECOND            EQU     3
 TRACK_OVERLOAD          EQU     4
 TRACK_POWER_FAIL        EQU     5
+TRACK_DENIED            EQU     6
+TRACK_GRANTED           EQU     7
 
 		END

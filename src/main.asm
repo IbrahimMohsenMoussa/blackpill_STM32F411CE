@@ -16,7 +16,7 @@ FLOOR1_SP       equ 360
 FLOOR2_SP       equ 650
 
     ; --- Control Loop Constants ---
-CL_KP           equ 28
+CL_KP           equ 25
 CL_KI           equ 2
 
     ; ==============================================================================
@@ -233,7 +233,7 @@ loop_restart
     b main_loop
 
     ; ==============================================================================
-    ; Subsystem Stubs
+    ; Subsystem Routines
     ; ==============================================================================
 EXECUTE_EMERGENCY
     push {r0-r3, lr}
@@ -363,9 +363,9 @@ loop_moving
     cmp r7, r12
     ble skip_soft_start
     sub r1, r7, r12
-    cmp r1, #95
+    cmp r1, #80
     ble skip_soft_start
-    add r7, r12, #95
+    add r7, r12, #80
 skip_soft_start
 
     ; Apply Speed
@@ -502,12 +502,12 @@ vip_authorized
     ldr r0, =Sys_Keypad_Unlocked
     movs r1, #1
     strb r1, [r0]           ; Set unlocked state to 1
-    movs r0, #TRACK_GROUND  ; Success sound
+    movs r0, #TRACK_GRANTED ; Success sound
     bl DFP_PlayImmediate
     b IDLE_END              ; Wait for user input on next cycle
 
 vip_unauthorized
-    movs r0, #TRACK_OVERLOAD ; Error buzz
+    movs r0, #TRACK_DENIED ; Error buzz
     bl DFP_PlayImmediate
     b IDLE_END
 
@@ -545,7 +545,7 @@ check_keypad
     b check_external
 
 keypad_locked
-    movs r0, #TRACK_OVERLOAD ; Error buzz for locked keypad
+    movs r0, #TRACK_DENIED ; Error buzz for locked keypad
     bl DFP_PlayImmediate
     b IDLE_END
 
